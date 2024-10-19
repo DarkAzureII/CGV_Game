@@ -24,8 +24,26 @@ CGV_Game is a 3D action game inspired by Vampire Survivors, built using Three.js
    npm install
  
 ## Usage
-To run the game, use the following command:
+- To run the game, use the following command:
   ```bash
   npx vite
+- Open your web browser and go to http://localhost:3000 (or the port specified in the terminal) to start playing.
 
+## Contributing
+
+Contributions are welcome! If you’d like to contribute to CGV_Game, please follow these steps:
+1. Fork the repository.
+2. Create a new branch:
+   ```bash
+   git checkout -b feature-YourFeature
+3. Make your changes and commit them:
+   ```bash
+   git commit -m 'Add some feature'
+4. Push to the branch:
+   ```bash
+   git push origin feature-YourFeature
+5. Open a pull request.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
 
