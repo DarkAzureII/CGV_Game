@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { Player } from './player.js';
 import { Enemy } from './enemy.js';
 import { levels } from './levels.js';
-import { Environment } from './Environment.js'; // Import the Environment component
+import { Environment } from './Environment.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'; // Import PointerLockControls
 
 export class Game {
   constructor() {
@@ -13,6 +14,9 @@ export class Game {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
+
+    this.controls = new PointerLockControls(this.camera, document.body); // Initialize PointerLockControls
+    this.scene.add(this.controls.getObject()); // Add controls to the scene
 
     this.player = new Player(this.scene);
     this.enemies = [];
@@ -27,6 +31,11 @@ export class Game {
   }
 
   setupControls() {
+    // Event listener for mouse lock
+    document.addEventListener('click', () => {
+      this.controls.lock(); // Lock the pointer on click
+    });
+
     document.addEventListener('keydown', (event) => {
       if (event.code === 'ArrowLeft' || event.code === 'KeyA') this.keys.left = true;
       if (event.code === 'ArrowRight' || event.code === 'KeyD') this.keys.right = true;
