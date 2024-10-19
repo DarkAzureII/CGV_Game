@@ -10,8 +10,7 @@
     <script type="module">
       import { Game } from '../src/components/game.js';
       const game = new Game();
-      game.render(document.getElementById('game-container'));
-      setInterval(() => game.spawnEnemy(), 2000);
+      game.render();
     </script>
   </body>
 </html>

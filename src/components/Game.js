@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Player } from './player.js';
 import { Enemy } from './enemy.js';
+import { levels } from './levels.js'; // Import levels configuration
 
 export class Game {
   constructor() {
@@ -14,9 +15,12 @@ export class Game {
 
     this.player = new Player(this.scene);
     this.enemies = [];
+    this.currentLevelIndex = 0; // Track the current level
+    this.spawnInterval = null;
 
     this.keys = { left: false, right: false, forward: false, backward: false };
     this.setupControls();
+    this.startLevel(); // Start the first level
   }
 
   setupControls() {
@@ -35,6 +39,23 @@ export class Game {
     });
   }
 
+  startLevel() {
+    const level = levels[this.currentLevelIndex]; // Get the current level configuration
+    this.enemies = []; // Reset enemies
+    this.spawnEnemies(level.enemyCount); // Spawn enemies for the level
+    this.startEnemySpawning(level.spawnRate); // Start spawning enemies
+  }
+
+  startEnemySpawning(spawnRate) {
+    this.spawnInterval = setInterval(() => this.spawnEnemy(), spawnRate);
+  }
+
+  spawnEnemies(count) {
+    for (let i = 0; i < count; i++) {
+      this.spawnEnemy();
+    }
+  }
+
   spawnEnemy() {
     this.enemies.push(new Enemy(this.scene));
   }
@@ -42,6 +63,21 @@ export class Game {
   update() {
     this.player.updateMovement(this.keys);
     this.enemies.forEach(enemy => enemy.moveToward(this.player.mesh));
+    
+    // Check if the level is complete (customize this logic as needed)
+    if (this.enemies.length === 0) {
+      this.levelComplete();
+    }
+  }
+
+  levelComplete() {
+    clearInterval(this.spawnInterval); // Stop spawning enemies
+    if (this.currentLevelIndex < levels.length - 1) {
+      this.currentLevelIndex++; // Move to the next level
+      this.startLevel(); // Start the next level
+    } else {
+      console.log('Game Complete!'); // Handle game completion logic here
+    }
   }
 
   render() {
