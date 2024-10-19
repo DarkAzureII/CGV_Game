@@ -2,7 +2,8 @@
 import * as THREE from 'three';
 import { Player } from './player.js';
 import { Enemy } from './enemy.js';
-import { levels } from './levels.js'; // Import levels configuration
+import { levels } from './levels.js';
+import { Environment } from './Environment.js'; // Import the Environment component
 
 export class Game {
   constructor() {
@@ -15,12 +16,14 @@ export class Game {
 
     this.player = new Player(this.scene);
     this.enemies = [];
-    this.currentLevelIndex = 0; // Track the current level
+    this.currentLevelIndex = 0;
     this.spawnInterval = null;
 
     this.keys = { left: false, right: false, forward: false, backward: false };
     this.setupControls();
-    this.startLevel(); // Start the first level
+    
+    new Environment(this.scene); // Create the environment
+    this.startLevel();
   }
 
   setupControls() {
@@ -28,7 +31,7 @@ export class Game {
       if (event.code === 'ArrowLeft' || event.code === 'KeyA') this.keys.left = true;
       if (event.code === 'ArrowRight' || event.code === 'KeyD') this.keys.right = true;
       if (event.code === 'ArrowUp' || event.code === 'KeyW') this.keys.forward = true;
-      if (event.code === 'ArrowDown' || event.code === 'KeyS') this.keys.backward = false;
+      if (event.code === 'ArrowDown' || event.code === 'KeyS') this.keys.backward = true;
     });
 
     document.addEventListener('keyup', (event) => {
@@ -40,10 +43,10 @@ export class Game {
   }
 
   startLevel() {
-    const level = levels[this.currentLevelIndex]; // Get the current level configuration
-    this.enemies = []; // Reset enemies
-    this.spawnEnemies(level.enemyCount); // Spawn enemies for the level
-    this.startEnemySpawning(level.spawnRate); // Start spawning enemies
+    const level = levels[this.currentLevelIndex];
+    this.enemies = [];
+    this.spawnEnemies(level.enemyCount);
+    this.startEnemySpawning(level.spawnRate);
   }
 
   startEnemySpawning(spawnRate) {
@@ -63,20 +66,19 @@ export class Game {
   update() {
     this.player.updateMovement(this.keys);
     this.enemies.forEach(enemy => enemy.moveToward(this.player.mesh));
-    
-    // Check if the level is complete (customize this logic as needed)
+
     if (this.enemies.length === 0) {
       this.levelComplete();
     }
   }
 
   levelComplete() {
-    clearInterval(this.spawnInterval); // Stop spawning enemies
+    clearInterval(this.spawnInterval);
     if (this.currentLevelIndex < levels.length - 1) {
-      this.currentLevelIndex++; // Move to the next level
-      this.startLevel(); // Start the next level
+      this.currentLevelIndex++;
+      this.startLevel();
     } else {
-      console.log('Game Complete!'); // Handle game completion logic here
+      console.log('Game Complete!');
     }
   }
 
