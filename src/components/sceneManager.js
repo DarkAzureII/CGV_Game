@@ -38,6 +38,10 @@ export class SceneManager {
     this.scene.add(directionalLight);
   }
 
+  addToScene(object) {
+    this.scene.add(object);
+  }
+
   loadIsland() {
     const loader = new GLTFLoader();
     loader.load('/assets/untitled.glb', (gltf) => {

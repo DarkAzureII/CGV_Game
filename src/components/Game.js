@@ -12,6 +12,7 @@ export class Game {
   constructor() {
     this.sceneManager = new SceneManager();
     this.physicsWorld = new PhysicsWorld();
+    this.physicsWorld = new PhysicsWorld(this.sceneManager);
     this.player = new Player(this.sceneManager.scene, this.physicsWorld.world);
     this.enemyManager = new EnemyManager(this.sceneManager.scene, this.physicsWorld.world);
     this.levelManager = new LevelManager(this.enemyManager);
