@@ -1,20 +1,53 @@
 // src/components/Player.js
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 
 export class Player {
-  constructor(scene) {
-    const playerGeometry = new THREE.BoxGeometry(5, 1, 5);
-    const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    this.mesh = new THREE.Mesh(playerGeometry, playerMaterial);
-    this.moveSpeed = 0.3;
+  constructor(scene, world) {
+    this.scene = scene;
+    this.world = world;
 
-    scene.add(this.mesh);
+    const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    this.mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+    this.scene.add(this.mesh);
+
+    const playerShape = new CANNON.Box(new CANNON.Vec3(0.5, 1, 0.5));
+    this.body = new CANNON.Body({
+      mass: 1,
+      position: new CANNON.Vec3(0, 5, 0), // Start slightly above the ground
+      shape: playerShape
+    });
+    this.world.addBody(this.body);
+
+    this.health = 100; // Player starts with 100 health
+    this.isAlive = true; // Track if the player is alive
+
+    this.moveSpeed = 0.5;
+  }
+
+  takeDamage(amount) {
+    this.health -= amount;
+    console.log(`Player health: ${this.health}`);
+    if (this.health <= 0) {
+      this.die();
+    }
+  }
+
+  die() {
+    console.log("Player has died.");
+    this.isAlive = false;
+    // Optionally: Implement logic to reset the game or trigger a game-over screen
   }
 
   updateMovement(keys) {
-    if (keys.left) this.mesh.position.x -= this.moveSpeed;
-    if (keys.right) this.mesh.position.x += this.moveSpeed;
-    if (keys.forward) this.mesh.position.z -= this.moveSpeed;
-    if (keys.backward) this.mesh.position.z += this.moveSpeed;
+    // Use keys to control player movement
+    if (keys.forward) this.body.position.z -= this.moveSpeed;
+    if (keys.backward) this.body.position.z += this.moveSpeed;
+    if (keys.left) this.body.position.x -= this.moveSpeed;
+    if (keys.right) this.body.position.x += this.moveSpeed;
+
+    // Update mesh position based on physics body
+    this.mesh.position.copy(this.body.position);
   }
 }

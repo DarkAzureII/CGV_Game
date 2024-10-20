@@ -1,5 +1,6 @@
 // src/components/Environment.js
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class Environment {
   constructor(scene) {
@@ -7,6 +8,7 @@ export class Environment {
     this.createGround();
     this.createWalls();
     this.addLighting();
+    
   }
 
   createGround() {
