@@ -8,7 +8,7 @@ export class Enemy {
     this.world = world;
 
     // Create Three.js Mesh for visual representation
-    const enemyGeometry = new THREE.SphereGeometry(3, 4, 5);
+    const enemyGeometry = new THREE.BoxGeometry(2, 2, 2); // Create a cube geometry
     const enemyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
     this.mesh = new THREE.Mesh(enemyGeometry, enemyMaterial);
     this.mesh.castShadow = true;
@@ -16,10 +16,10 @@ export class Enemy {
     this.scene.add(this.mesh);
 
     // Create Cannon.js body for physics
-    const enemyShape = new CANNON.Sphere(3); // Match size with Three.js SphereGeometry
+    const enemyShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1)); // Match size with Three.js BoxGeometry
     this.body = new CANNON.Body({
       mass: 1, // Small mass to prevent flying away
-      position: new CANNON.Vec3(Math.random() * 40 - 20, 3, Math.random() * 40 - 20), // Start at a random position
+      position: new CANNON.Vec3(Math.random() * 40 - 20, 1, Math.random() * 40 - 20), // Start at a random position
       shape: enemyShape,
       material: new CANNON.Material({ friction: 0.9, restitution: 0.1 }), // Control friction and bounciness
     });
@@ -29,10 +29,10 @@ export class Enemy {
     this.body.updateMassProperties(); // Update mass properties to reflect changes
 
     this.world.addBody(this.body);
-    this.health = 5; // Enemy starts with 50 health
+    this.health = 5; // Enemy starts with 5 health
     this.isAlive = true; // Track if enemy is alive
 
-    this.speed = 10; // Control how fast enemies move toward the player
+    this.speed = 20; // Control how fast enemies move toward the player
   }
 
   takeDamage(amount) {

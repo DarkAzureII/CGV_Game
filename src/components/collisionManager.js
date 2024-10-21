@@ -3,6 +3,10 @@ export class CollisionManager {
     this.world = world;
     this.player = player;
     this.enemyManager = enemyManager;
+
+    // Cooldown properties
+    this.damageCooldown = 1000; // 1 second cooldown
+    this.lastDamageTime = 0; // Timestamp of last damage
   }
 
   setup() {
@@ -10,28 +14,34 @@ export class CollisionManager {
   }
 
   checkCollisions() {
+    const currentTime = Date.now(); // Get the current time
+
     for (let i = this.enemyManager.enemies.length - 1; i >= 0; i--) {
       const enemy = this.enemyManager.enemies[i];
       const distance = this.player.body.position.distanceTo(enemy.body.position);
 
       // Collision damage (e.g., when enemy touches the player)
-      if (distance < 6) {
-        this.handleCollisionDamage(enemy, i);
+      if (distance < 2) {
+        this.handleCollisionDamage(enemy, i, currentTime);
       }
     }
   }
 
-  // Handle damage from collisions (e.g., when enemies collide with the player)
-  handleCollisionDamage(enemy, index) {
+  handleCollisionDamage(enemy, index, currentTime) {
     const collisionDamage = 10;
 
-    // Damage the player when colliding with the enemy
-    this.player.health -= collisionDamage;
-    console.log(`Player health: ${this.player.health}`);
+    // Apply damage if the cooldown has passed
+    if (currentTime - this.lastDamageTime > this.damageCooldown) {
+      this.player.health -= collisionDamage;
+      this.player.takeDamage(collisionDamage);
+      console.log(`Player health: ${this.player.health}`);
+
+      // Update the last damage time
+      this.lastDamageTime = currentTime;
+    }
 
     // Damage the enemy if necessary
-    //enemy.health -= collisionDamage;
-    //console.log(`Enemy health: ${enemy.health}`);
+    // enemy.health -= collisionDamage; // Uncomment if you want to damage the enemy
 
     // Remove the enemy if its health is below or equal to 0
     if (enemy.health <= 0) {

@@ -1,5 +1,6 @@
 // File: levelManager.js
 import { levels } from './levels.js';
+import { Menu } from './menu.js';
 
 export class LevelManager {
   constructor(enemyManager) {
@@ -30,6 +31,10 @@ export class LevelManager {
       this.startLevel();
     } else {
       console.log('Game Complete!');
+      const menu = new Menu();
+      menu.render();
     }
   }
+
+  
 }

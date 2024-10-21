@@ -42,21 +42,6 @@ export class SceneManager {
     this.scene.add(object);
   }
 
-  loadIsland() {
-    const loader = new GLTFLoader();
-    loader.load('/assets/untitled.glb', (gltf) => {
-      this.scene.add(gltf.scene);
-      this.setupIsland(gltf.scene);
-    }, undefined, (error) => {
-      console.error('An error occurred while loading the island:', error);
-    });
-  }
-
-  setupIsland(island) {
-    island.position.set(0, 0, 0);
-    island.scale.set(1, 1, 1);
-  }
-
   render() {
     this.renderer.render(this.scene, this.camera);
   }
