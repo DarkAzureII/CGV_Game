@@ -15,7 +15,7 @@ export class SceneManager {
     this.setupRenderer();
     this.setupCamera();
     this.setupLights();
-    this.loadIsland();
+    //this.loadIsland();
   }
 
   setupRenderer() {

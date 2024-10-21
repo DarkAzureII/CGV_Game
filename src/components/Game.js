@@ -1,12 +1,14 @@
 // File: game.js
 import * as THREE from 'three';
-import { Player } from './player.js';
+import { Player } from './Player.js';
 import { EnemyManager } from './enemyManager.js';
 import { LevelManager } from './levelManager.js';
 import { PhysicsWorld } from './physicsWorld.js';
 import { SceneManager } from './sceneManager.js';
 import { InputManager } from './inputManager.js';
 import { CollisionManager } from './collisionManager.js';
+
+const clock = new THREE.Clock(); 
 
 export class Game {
   constructor() {
@@ -35,6 +37,7 @@ export class Game {
     this.player.updateMovement(this.inputManager.keys);
     this.enemyManager.update(this.player.mesh);
     this.collisionManager.checkCollisions();
+    this.player.shoot(this.enemyManager, this.inputManager.mouse, clock, this.collisionManager);  // Pass mouse data and enemy manager to handle shooting
 
     if (this.enemyManager.enemies.length === 0) {
       this.levelManager.levelComplete();
