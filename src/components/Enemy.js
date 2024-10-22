@@ -1,19 +1,26 @@
 // src/components/Enemy.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 export class Enemy {
   constructor(scene, world) {
     this.scene = scene;
     this.world = world;
 
-    // Create Three.js Mesh for visual representation
-    const enemyGeometry = new THREE.BoxGeometry(2, 2, 2); // Create a cube geometry
-    const enemyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    this.mesh = new THREE.Mesh(enemyGeometry, enemyMaterial);
-    this.mesh.castShadow = true;
-    this.mesh.receiveShadow = true;
-    this.scene.add(this.mesh);
+    // Load the low-poly wolf model
+    const loader = new GLTFLoader();
+    loader.load('/assets/LowPolyWolf.glb', (gltf) => {
+      this.mesh = gltf.scene;
+      this.mesh.scale.set(4, 4, 4); // Scale down if necessary
+      this.mesh.traverse((node) => {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+      });
+      this.scene.add(this.mesh);
+    });
 
     // Create Cannon.js body for physics
     const enemyShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1)); // Match size with Three.js BoxGeometry
@@ -53,7 +60,7 @@ export class Enemy {
   moveToward(target) {
     // Get the direction vector from the enemy to the player
     const direction = new THREE.Vector3();
-    direction.subVectors(target.position, this.mesh.position).normalize(); // Normalize for consistent movement
+    direction.subVectors(target.position, this.body.position).normalize(); // Normalize for consistent movement
 
     // Set the velocity directly towards the player (XZ plane only)
     this.body.velocity.x = direction.x * this.speed;
@@ -64,7 +71,9 @@ export class Enemy {
   }
 
   update() {
-    // Sync the position of the Three.js mesh with the Cannon.js body
-    this.mesh.position.copy(this.body.position);
+    if (this.mesh) {
+      this.mesh.position.copy(this.body.position);
+      this.mesh.quaternion.copy(this.body.quaternion); // Sync rotation if needed
+    }
   }
 }

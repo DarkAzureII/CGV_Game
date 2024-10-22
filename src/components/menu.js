@@ -26,7 +26,6 @@ export class Menu {
         this.popGame();
         this.currentGame = new Game();
         this.currentGame.render();
-        this.currentGame.sceneManager.controls.lock(); // Lock pointer here
     }
 
     quitGame() {

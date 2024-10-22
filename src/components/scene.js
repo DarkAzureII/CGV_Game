@@ -1,10 +1,12 @@
-// File: sceneManager.js
 import * as THREE from 'three';
+
 export class SceneManager {
   constructor(player) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    this.player = player; // Reference to the player object
 
     // Smooth camera transition parameters
     this.cameraLerpSpeed = 0.1; // Control how smoothly the camera follows the player
@@ -15,7 +17,6 @@ export class SceneManager {
     this.minDistance = 5; // Minimum zoom distance
     this.maxDistance = 50; // Maximum zoom distance
     this.currentDistance = 30; // Current distance from the player
-
   }
 
   setup() {
@@ -63,8 +64,8 @@ export class SceneManager {
     });
   }
 
-  updateCamera(player) {
-    if (!player || !player.body) return;
+  updateCamera() {
+    if (!this.player || !this.player.body) return;
 
     // Offset values for the third-person view
     const offsetX = 0;  // Stay directly behind the player
@@ -88,11 +89,8 @@ export class SceneManager {
     this.camera.lookAt(playerPosition);
   }
 
-  addToScene(object) {
-    this.scene.add(object);
-  }
-
   render() {
+    this.updateCamera(); // Update camera every frame
     this.renderer.render(this.scene, this.camera);
   }
 
