@@ -25,6 +25,7 @@ export class Game {
     this.player.onDie = () => this.gameOver();
 
     this.setupGame();
+    this.requestPointerLock(); 
   }
 
   setupGame() {
@@ -32,6 +33,34 @@ export class Game {
     this.physicsWorld.setup();
     this.levelManager.startLevel();
     this.collisionManager.setup();
+  }
+
+  requestPointerLock() {
+    const canvas = this.sceneManager.renderer.domElement;
+    
+    canvas.addEventListener('click', () => {
+      canvas.requestPointerLock();
+    });
+  
+    // Listen for pointer lock changes or errors
+    document.addEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
+    document.addEventListener('pointerlockerror', this.pointerLockError, false);
+  }
+  
+  pointerLockChange() {
+    const canvas = this.sceneManager.renderer.domElement;
+  
+    if (document.pointerLockElement === canvas) {
+      console.log('Pointer locked.');
+      this.inputManager.enableMouseControls();  // Enable your custom mouse controls here
+    } else {
+      console.log('Pointer unlocked.');
+      this.inputManager.disableMouseControls(); // Disable mouse controls when unlocked
+    }
+  }
+  
+  pointerLockError() {
+    console.error('Error locking pointer.');
   }
 
   update() {

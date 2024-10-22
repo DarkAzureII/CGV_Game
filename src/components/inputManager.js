@@ -4,8 +4,6 @@ export class InputManager {
     this.keys = { left: false, right: false, forward: false, backward: false };
     this.mouse = { isRightButtonDown: false };  // Add mouse state
 
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
     // Keyboard events
     document.addEventListener('keydown', (event) => this.handleKeyDown(event));
     document.addEventListener('keyup', (event) => this.handleKeyUp(event));
