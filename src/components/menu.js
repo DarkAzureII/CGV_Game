@@ -8,7 +8,7 @@ export class Menu {
 
     render() {
         this.container.innerHTML = `
-            <h1>Welcome to I am the Tank!!!</h1>
+            <h1>I am the Tank!!!</h1>
             <button id="start-button">Start Game</button>
             <button id="quit-button">Quit</button>
         `;
