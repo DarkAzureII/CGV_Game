@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Dream of Eden</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      /* Common button styling */
+      .control-button {
+        position: fixed;
+        top: 10px;
+        font-size: 30px;
+        color: #fff;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      #pause-button {
+        right: 60px; /* Align to the left of the quit button */
+      }
+
+      #quit-button {
+        right: 10px; /* Place on the far right */
+      }
+
+      .control-button:hover {
+        color: #ccc;
+      }
+
+      /* Popup confirmation styling */
+      #confirmation-popup {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.85); /* Darker semi-transparent background */
+        color: #fff;
+        padding: 30px 40px;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 20;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
+      }
+
+      #confirmation-popup p {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+
+      #confirmation-popup button {
+        margin: 0 15px; /* Spacing between the buttons */
+        padding: 10px 25px;
+        font-size: 16px;
+        cursor: pointer;
+        color: #fff;
+        background-color: #444;
+        border: none;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+      }
+
+      #confirmation-popup button:hover {
+        background-color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <button id="pause-button" class="control-button"><i class="fas fa-pause"></i></button>
+    <button id="quit-button" class="control-button"><i class="fas fa-door-open"></i></button>
+
+    <!-- Confirmation popup -->
+    <div id="confirmation-popup">
+      <p>Are you sure you want to quit?</p>
+      <button id="confirm-yes">Yes</button>
+      <button id="confirm-no">No</button>
+    </div>
+
+    <script type="module">
+      import { Menu } from '../src/components/menu.js'; // Update the path if necessary
+      const menu = new Menu();
+      menu.render();
+
+      const pauseButton = document.getElementById('pause-button');
+      const quitButton = document.getElementById('quit-button');
+      const confirmationPopup = document.getElementById('confirmation-popup');
+      const confirmYes = document.getElementById('confirm-yes');
+      const confirmNo = document.getElementById('confirm-no');
+
+      // Pause button functionality
+      pauseButton.addEventListener('click', () => {
+        if (menu.currentGame && !menu.currentGame.paused) {
+          menu.currentGame.pause();
+          pauseButton.innerHTML = '<i class="fas fa-play"></i>'; // Change to play icon
+        } else if (menu.currentGame) {
+          menu.currentGame.resume();
+          pauseButton.innerHTML = '<i class="fas fa-pause"></i>'; // Change to pause icon
+        }
+      });
+
+      // Quit button functionality
+      quitButton.addEventListener('click', () => {
+        if (menu.currentGame) {
+          menu.currentGame.pause(); // Pause the game
+        }
+        confirmationPopup.style.display = 'block'; // Show confirmation popup
+      });
+
+      // Confirmation "Yes" button functionality
+      confirmYes.addEventListener('click', () => {
+        window.location.href = 'index.html'; // Redirect to index page
+      });
+
+      // Confirmation "No" button functionality
+      confirmNo.addEventListener('click', () => {
+        confirmationPopup.style.display = 'none'; // Hide the popup
+        if (menu.currentGame) {
+          menu.currentGame.resume(); // Resume the game
+        }
+      });
+    </script>
+  </body>
+</html>

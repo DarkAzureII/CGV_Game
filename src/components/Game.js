@@ -72,7 +72,11 @@ export class Game {
     this.player.updateMovement(this.inputManager.keys);
     this.enemyManager.update(this.player.mesh);
     this.collisionManager.checkCollisions();
+
+    
     this.sceneManager.updateCamera(this.player);
+
+
     this.player.shoot(this.enemyManager, this.inputManager.mouse, clock, this.collisionManager);  // Pass mouse data and enemy manager to handle shooting
 
     if (this.enemyManager.enemies.length === 0) {
@@ -152,6 +156,7 @@ export class Game {
 
   start() {
     this.paused = false; // Unpause the game and allow updates
+    this.levelManager.startLevel();
   }
   pause() {
     console.log("Game paused.");

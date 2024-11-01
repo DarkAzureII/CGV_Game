@@ -2,7 +2,7 @@ export class InputManager {
   constructor(controls) {
     this.controls = controls;
     this.keys = { left: false, right: false, forward: false, backward: false };
-    this.mouse = { isRightButtonDown: false };  // Add mouse state
+    this.mouse = { isRightButtonDown: false, deltaX: 0, deltaY: 0 };
 
     // Keyboard events
     document.addEventListener('keydown', (event) => this.handleKeyDown(event));
@@ -11,6 +11,7 @@ export class InputManager {
     // Mouse events
     document.addEventListener('mousedown', (event) => this.handleMouseDown(event));
     document.addEventListener('mouseup', (event) => this.handleMouseUp(event));
+    document.addEventListener('mousemove', (event) => this.handleMouseMove(event));
 
 
   }
@@ -40,4 +41,16 @@ export class InputManager {
       this.mouse.isRightButtonDown = false;
     }
   }
+
+
+  handleMouseMove(event) {
+    this.mouse.deltaX = event.movementX;
+    this.mouse.deltaY = event.movementY;
+  }
+
+  resetMouseDeltas() {
+    this.mouse.deltaX = 0;
+    this.mouse.deltaY = 0;
+  }
+
 }
