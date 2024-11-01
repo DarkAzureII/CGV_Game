@@ -1,5 +1,5 @@
 // File: enemyManager.js
-import { Enemy } from './enemy.js';
+import { Enemy } from './Enemy.js';
 
 export class EnemyManager {
   constructor(scene, world) {
@@ -12,7 +12,14 @@ export class EnemyManager {
   spawnEnemy() {
     if (this.enemies.length < this.maxEnemies) {
       const enemy = new Enemy(this.scene, this.world);
-      this.enemies.push(enemy);
+
+      // Wait until the enemy's mesh is loaded before adding it
+      const checkLoaded = setInterval(() => {
+        if (enemy.mesh) {
+          this.enemies.push(enemy);
+          clearInterval(checkLoaded); // Stop checking once it's loaded
+        }
+      }, 100); // Check every 100ms
     }
   }
 

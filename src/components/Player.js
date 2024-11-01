@@ -1,6 +1,7 @@
 // src/components/Player.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import { Projectile } from './projectile';
 
 export class Player {
   constructor(scene, world) {
@@ -108,20 +109,29 @@ updateHealthBar() {
     this.healthBar.position.y += 2.5;
   }
 
-  shoot(enemyManager, mouse, clock, collisionManager) {
-    if (mouse.isRightButtonDown && clock.getElapsedTime() - this.lastShotTime > this.shootCooldown) {
-      this.lastShotTime = clock.getElapsedTime();  // Reset the cooldown
-  
-      for (let i = 0; i < enemyManager.enemies.length; i++) {
-        const enemy = enemyManager.enemies[i];
-        const distance = this.body.position.distanceTo(enemy.body.position);
-  
-        if (distance <= this.shootRange) {
-          // Deal damage to the enemy using CollisionManager's handleEnemyHit
-          collisionManager.handleEnemyHit(enemy, i, 20);  // Assuming 20 is the shooting damage
-          break;
-        }
+
+  shoot(enemyManager, mouse, clock, scene, world, collisionManager) {
+      if (mouse.isRightButtonDown && clock.getElapsedTime() - this.lastShotTime > this.shootCooldown) {
+          this.lastShotTime = clock.getElapsedTime();  // Reset the cooldown
+
+          // Select the first enemy as a target if it exists
+          const targetEnemy = enemyManager.enemies[0];
+          if (targetEnemy) {
+              // Create a new projectile aimed at the enemy
+              const projectile = new Projectile(
+                  scene,
+                  this.body.position.clone(),
+                  targetEnemy.body.position.clone(),
+                  20, // Damage dealt by the projectile
+                  2,  // Maximum lifetime in seconds
+                  enemyManager,
+                  collisionManager
+              );
+
+              // Add projectile update to the main game loop instead of postStep
+              world.addProjectile(projectile); // Assuming world has a projectiles array
+          }
       }
-    }
-  }  
+  }
+
 }
