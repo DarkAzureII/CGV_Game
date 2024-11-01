@@ -1,17 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I am the Tank!!!</title>
+    <meta charset="utf-8" />
+    <title>The Last Dream of Eden</title>
+    <!-- Preconnect and import the McLaren and Square Peg fonts from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=McLaren&family=Square+Peg&display=swap" rel="stylesheet">
+
+    <style>
+      * {
+        color: white;
+        font-family: "Source Code Pro", monospace;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Wrapper to hold the blurred background */
+      .background-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-image: url("/assets/background.jpg"); /* Update with your image path */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-blend-mode: darken;
+        filter: blur(5px); /* Adjust the blur value as needed */
+      }
+
+      /* Overlay to darken the background */
+      .background-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity to make it darker */
+        z-index: -1;
+      }
+
+      body {
+        height: 100vh;
+        overflow: hidden; /* Hide overflow on the body */
+        font-family: "Source Code Pro", monospace, Arial, sans-serif;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        margin: 0;
+        text-align: center;
+        position: relative; /* Ensure content stays above the blurred background */
+      }
+
+      .title-container {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .main-title {
+        font-size: 5rem;
+        font-family: 'Square Peg', cursive;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        letter-spacing: 2px;
+        margin: 0;
+        padding: 10px 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        height: 80vh;
+        overflow-y: scroll; /* Enable scrolling for content */
+        scrollbar-width: none; /* Hide scrollbar in Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+      .container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .fade-in {
+        opacity: 1;
+        text-align: center;
+        line-height: 1.6;
+        font-family: 'McLaren', sans-serif;
+      }
+
+      /* Styles for the button */
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        font-family: 'McLaren', sans-serif;
+        color: #ffffff;
+        background-color: #444444;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s;
+      }
+
+      .button:hover {
+        background-color: #666666;
+      }
+    </style>
   </head>
+
   <body>
-    <div id="game-container"></div>
-    <script type="module">
-      import { Menu } from '../src/components/menu.js';  // Update the path if necessary
-      const menu = new Menu();
-      menu.render();
-    </script>
+    <!-- Blurred background image -->
+    <div class="background-wrapper"></div>
+    <!-- Overlay to darken the background -->
+    <div class="background-overlay"></div>
+
+    <div class="title-container">
+      <h1 class="main-title">The Last Dream of Eden</h1>
+    </div>
+    <div class="container">
+      <!-- Your story content -->
+      <p class="fade-in">
+        Long ago, the world you inhabit wasn’t a barren wasteland dotted with the remnants of a once-thriving civilization. It was Eden—a lush, vibrant land blessed with bioluminescent trees and skies that danced in colors unknown to mortal eyes.
+        <br><br>
+        But in every dream lies a shadow, and Eden's shadow was the Forsaken—a fractured sect of Guardians who had grown weary of eternal duty. Led by a Guardian named Kaldrin, who believed Eden was nothing more than a prison for their powers, the Forsaken yearned to break free from the chains of balance and create a world where they could be gods.
+        <br><br>
+        Kaldrin’s rebellion brought the Great Sundering: an event that twisted Eden’s beauty into desolation. The Forsaken tore the skies apart and poisoned the very essence of the land.
+        <br><br>
+        In the final moments of the Great Sundering, Eden’s last Guardian, Elaris, made a desperate pact. Sacrificing her immortal form, she fractured her soul into thousands of glowing seeds, spreading them across the barren land. Her final wish was that the seeds would one day restore life and hope to a world in ruins, should someone prove worthy.
+        <br><br>
+        You are a Wanderer—a lone survivor traversing the endless wastelands of a shattered Eden. You don’t know where you came from or who you were before the desolation. All you know is a haunting presence pulls you forward, as if something deep within the ruins is calling out to you.
+        <br><br>
+        Your life is bound to Eden’s final Guardian, Elaris. Her fragmented soul lives within you, gifting you her ancient power, but also cursing you with the burden of her memories and sorrow.
+        <br><br>
+        As you progress, you realize that restoring Eden comes at a cost. Each Guardian Seed you awaken grants a sliver of Eden’s light back to the world, but it also takes a piece of your humanity, replacing it with Elaris’s sorrow and regrets. The land begins to heal, yet you feel yourself becoming more and more a vessel for Elaris’s essence.
+        <br><br>
+        Will you restore Eden completely, even if it means losing yourself to Elaris’s soul? Or will you search for a way to break the cycle, finding redemption not just for Eden, but for the spirit that haunts your every step?
+      </p>
+
+      <!-- Button to navigate to menu.html -->
+
+      
+      <a href="instructions.html" class="button">Go to Instructions</a>
+
+    </div>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

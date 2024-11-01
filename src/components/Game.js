@@ -1,3 +1,4 @@
+
 import * as THREE from 'three';
 import { Player } from './Player.js';
 import { EnemyManager } from './enemyManager.js';
@@ -254,6 +255,7 @@ pointerLockError() {
 
   start() {
     this.paused = false; // Unpause the game and allow updates
+    this.levelManager.startLevel();
   }
   pause() {
     console.log("Game paused.");
