@@ -57,7 +57,7 @@ export class CollisionManager {
 
   // Handle damage from shooting
   handleEnemyHit(enemy, index, damage) {
-    console.log("Projectile has hit an enemy. Enemy data:", enemy);
+    console.log("Shot enemy!", enemy);
 
     // Deal damage to the enemy
     enemy.health -= damage;
@@ -65,9 +65,8 @@ export class CollisionManager {
 
     // If the enemy's health reaches 0 or below, remove it
     if (enemy.health <= 0) {
-        console.log(`Enemy ${index} killed!`);
-        this.enemyManager.removeEnemy(index);
+      console.log(`Enemy ${index} killed!`);
+      this.enemyManager.removeEnemy(index);
     }
-}
-
+  }
 }
