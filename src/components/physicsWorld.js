@@ -20,7 +20,7 @@ export class PhysicsWorld {
     this.addWorldBorders(250);
 
     // Initialize the cannon-es debugger
-    this.cannonDebugger = new CannonDebugger(this.sceneManager.scene, this.world);
+    //this.cannonDebugger = new CannonDebugger(this.sceneManager.scene, this.world);
   }
 
   addSkybox() {

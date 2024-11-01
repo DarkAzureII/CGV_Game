@@ -3,8 +3,7 @@ import * as THREE from 'three';
 export class SceneManager {
   constructor(player) {
     this.scene = new THREE.Scene();
-   // this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera = new THREE.PerspectiveCamera(90, 1280/720, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
     // Smooth camera transition parameters
@@ -16,15 +15,6 @@ export class SceneManager {
     this.minDistance = 5; // Minimum zoom distance
     this.maxDistance = 50; // Maximum zoom distance
     this.currentDistance = 30; // Current distance from the player
-
-
-
-    // Camera settings for rotation around the player
-    this.rotationSpeed = 0.002;   // Sensitivity of mouse movement
-    this.pitch = 0;               // Vertical rotation angle
-    this.yaw = 0;                 // Horizontal rotation angle
-    this.distance = 30;           // Distance from the player
-
 
   }
 
@@ -39,22 +29,19 @@ export class SceneManager {
 
   setupRenderer() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.shadowMap.enabled = true;  // Enable shadow maps
     document.body.appendChild(this.renderer.domElement);
   }
 
   setupCamera() {
-
     // Initial camera position: slightly above and behind the player
-    this.camera.position.set(0, 15, 0); //this.currentDistance);
-
+    this.camera.position.set(0, 15, this.currentDistance);
   }
 
   setupLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(50, 50, 50);
     directionalLight.castShadow = true;
     this.scene.add(directionalLight);
@@ -99,41 +86,10 @@ export class SceneManager {
   
     // Make the camera look at the player
     //this.camera.lookAt(playerPosition);
-    this.camera.position.set(0 + playerPosition.x, 15  , this.currentDistance + playerPosition.z/*playerPosition.z -10*/);
+    this.camera.position.set(0 + playerPosition.x, 15, this.currentDistance + playerPosition.z);
   
     // Log the camera position to debug
     console.log(`Camera Position: x=${this.camera.position.x}, y=${this.camera.position.y}, z=${this.camera.position.z}`);
-  }
-
-
-  updateCameraRotation() {
-    const { deltaX, deltaY } = this.inputManager.mouse;
-
-    // Update yaw (horizontal rotation) and pitch (vertical rotation)
-    this.yaw -= deltaX * this.rotationSpeed;
-    this.pitch -= deltaY * this.rotationSpeed;
-
-    // Clamp pitch to prevent flipping
-    const maxPitch = Math.PI / 3;  // Limit to around 60 degrees up/down
-    this.pitch = Math.max(-maxPitch, Math.min(maxPitch, this.pitch));
-
-    // Calculate the new camera position in spherical coordinates
-    const offsetX = this.distance * Math.cos(this.pitch) * Math.sin(this.yaw);
-    const offsetY = this.distance * Math.sin(this.pitch);
-    const offsetZ = this.distance * Math.cos(this.pitch) * Math.cos(this.yaw);
-
-    // Set the camera's position based on the player's position plus the offset
-    this.camera.position.set(
-      this.player.body.position.x + offsetX,
-      this.player.body.position.y + offsetY + 15,  // Keep it above the player
-      this.player.body.position.z + offsetZ
-    );
-
-    // Make the camera look at the player
-    this.camera.lookAt(this.player.body.position);
-
-    // Reset mouse deltas to avoid continuous rotation
-    this.inputManager.resetMouseDeltas();
   }
   
 
