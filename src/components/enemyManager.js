@@ -1,5 +1,5 @@
 // File: enemyManager.js
-import { Enemy } from './enemy.js';
+import { Enemy } from './Enemy.js';
 
 export class EnemyManager {
   constructor(scene, world) {

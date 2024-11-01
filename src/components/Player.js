@@ -1,41 +1,80 @@
-// src/components/Player.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Projectile } from './projectile';
 
 export class Player {
-  constructor(scene, world) {
-    this.scene = scene;
-    this.world = world;
+    constructor(scene, world) {
+        this.scene = scene;
+        this.world = world;
+        this.moveSpeed = 0.1;
 
-    const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    this.mesh = new THREE.Mesh(playerGeometry, playerMaterial);
-    this.scene.add(this.mesh);
+        // Temporary placeholder for `mesh`
+        const placeholderGeometry = new THREE.BoxGeometry(1, 2, 1);
+        const placeholderMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        this.mesh = new THREE.Mesh(placeholderGeometry, placeholderMaterial);
+        this.scene.add(this.mesh);
 
-    const playerShape = new CANNON.Box(new CANNON.Vec3(0.5, 1, 0.5));
-    this.body = new CANNON.Body({
-      mass: 1,
-      position: new CANNON.Vec3(0, 5, 0), // Start slightly above the ground
-      shape: playerShape
-    });
-    this.world.addBody(this.body);
+        // Create the physics body
+        this.createPhysicsBody();
 
-    this.body.fixedRotation = true;
-    this.body.updateMassProperties();
+        // Load the actual 3D model
+        this.loadModel();
 
-    this.health = 100; // Player starts with 100 health
-    this.isAlive = true; // Track if the player is alive
+        // Initialize player properties
+        this.health = 100;
+        this.isAlive = true;
+        this.shootRange = 10;
+        this.shootCooldown = 0.5;
+        this.lastShotTime = 0;
 
-    this.moveSpeed = 0.5;
+        // Create the health bar and shooting range
+        this.createShootingRangeCircle();
+        this.createHealthBar();
+    }
 
-    this.shootRange = 10;  // Set the range for shooting
-    this.shootCooldown = 0.5; // Cooldown time between shots (in seconds)
-    this.lastShotTime = 0;  // Track the time since the last shot
+    loadModel() {
+      const loader = new GLTFLoader();
+      loader.load('/assets/Dragon.glb', (gltf) => {
+          this.scene.remove(this.mesh); // Remove placeholder
+          this.model = gltf.scene;
+          this.mesh = this.model;  // Set `this.mesh` to the loaded model
+          this.scene.add(this.mesh);
+  
+          // Position and scale the model
+          this.mesh.scale.set(0.1, 0.1, 0.1);
+          this.mesh.position.copy(this.body.position);
 
-    this.createShootingRangeCircle();
-    this.createHealthBar();
+          console.log("Available animations:", gltf.animations.map(a => a.name));
+  
+          // Set up animations if available
+          this.mixer = new THREE.AnimationMixer(this.mesh);
+          // Access specific animations by name
+          this.flyAction = this.mixer.clipAction(gltf.animations.find(clip => clip.name === 'Fly_New'));
+          this.idleAction = this.mixer.clipAction(gltf.animations.find(clip => clip.name === 'Idel_New'));
+          this.runAction = this.mixer.clipAction(gltf.animations.find(clip => clip.name === 'Run_New'));
+          this.walkAction = this.mixer.clipAction(gltf.animations.find(clip => clip.name === 'Walk_New'));
+
+          // Start with idle animation
+          this.idleAction.play();
+      }, undefined, (error) => {
+          console.error("Error loading model:", error);
+      });
   }
+  
+
+    createPhysicsBody() {
+        const playerShape = new CANNON.Box(new CANNON.Vec3(0.5, 1, 0.5));
+        this.body = new CANNON.Body({
+            mass: 1,
+            position: new CANNON.Vec3(0, 5, 0),
+            shape: playerShape
+        });
+        this.world.addBody(this.body);
+
+        this.body.fixedRotation = true;
+        this.body.updateMassProperties();
+    }
 
   createHealthBar() {
     const barWidth = 1.5; // Width of the health bar
@@ -93,22 +132,60 @@ updateHealthBar() {
     // Placeholder for the event callback
   }
 
-  updateMovement(keys) {
-    // Use keys to control player movement
-    if (keys.forward) this.body.position.z -= this.moveSpeed;
-    if (keys.backward) this.body.position.z += this.moveSpeed;
-    if (keys.left) this.body.position.x -= this.moveSpeed;
-    if (keys.right) this.body.position.x += this.moveSpeed;
-    
+  update(keys, delta) {
+    this.updateMovement(keys);
+    if (this.mixer) this.mixer.update(delta); // Update animations
+    // Update the health bar's position
+    if (this.healthBar) {
+      this.healthBar.position.copy(this.body.position);
+      this.healthBar.position.y += 2.5; // Offset to keep it above the player's head
+    }
 
-    // Update mesh position based on physics body
-    this.mesh.position.copy(this.body.position);
-     // Update range circle position to match the player's position
-    this.rangeCircle.position.copy(this.mesh.position);
-    this.healthBar.position.copy(this.mesh.position);
-    this.healthBar.position.y += 2.5;
+    this.updateHealthBar(); // Update health bar position
   }
 
+  updateMovement(keys) {
+    const isMoving = keys.forward || keys.backward || keys.left || keys.right;
+
+    // Convert CANNON.Vec3 position to THREE.Vector3 for operations
+    const currentPosition = new THREE.Vector3(this.body.position.x, this.body.position.y, this.body.position.z);
+
+    if (isMoving) {
+        if (this.walkAction && !this.walkAction.isRunning()) {
+            // Stop other actions before starting walk
+            this.idleAction?.stop();
+            this.runAction?.stop();
+            this.walkAction.reset().play();
+        }
+
+        // Update position based on input
+        if (keys.forward) this.body.position.z -= this.moveSpeed;
+        if (keys.backward) this.body.position.z += this.moveSpeed;
+        if (keys.left) this.body.position.x -= this.moveSpeed;
+        if (keys.right) this.body.position.x += this.moveSpeed;
+
+        // Determine the direction vector based on movement
+        const targetPosition = new THREE.Vector3(this.body.position.x, this.body.position.y, this.body.position.z);
+        const direction = targetPosition.clone().sub(currentPosition).normalize().add(targetPosition);
+
+        // Make the model face the direction of movement
+        if (this.mesh) {
+            this.mesh.lookAt(direction);
+        }
+    } else {
+        // Play idle if not moving
+        if (this.idleAction && !this.idleAction.isRunning()) {
+            this.walkAction?.stop();
+            this.runAction?.stop();
+            this.idleAction.reset().play();
+        }
+    }
+
+    // Sync model with physics body
+    if (this.mesh) {
+        this.mesh.position.copy(this.body.position);
+    }
+  }
 
   shoot(enemyManager, mouse, clock, scene, world, collisionManager) {
       if (mouse.isRightButtonDown && clock.getElapsedTime() - this.lastShotTime > this.shootCooldown) {

@@ -20,6 +20,7 @@ export class Enemy {
         }
       });
       this.scene.add(this.mesh);
+      //console.log("Available animations:", gltf.animations.map(a => a.name));
     });
 
     // Create Cannon.js body for physics
@@ -39,7 +40,7 @@ export class Enemy {
     this.health = 5; // Enemy starts with 5 health
     this.isAlive = true; // Track if enemy is alive
 
-    this.speed = 20; // Control how fast enemies move toward the player
+    this.speed = 25; // Control how fast enemies move toward the player
   }
 
   takeDamage(amount) {
@@ -59,21 +60,29 @@ export class Enemy {
 
   moveToward(target) {
     // Get the direction vector from the enemy to the player
-    const direction = new THREE.Vector3();
-    direction.subVectors(target.position, this.body.position).normalize(); // Normalize for consistent movement
+    const targetPosition = new THREE.Vector3(target.position.x, this.body.position.y, target.position.z); // Target on XZ plane
+    const currentPosition = new THREE.Vector3(this.body.position.x, this.body.position.y, this.body.position.z);
 
-    // Set the velocity directly towards the player (XZ plane only)
+    // Calculate the direction vector and set velocity
+    const direction = new THREE.Vector3().subVectors(targetPosition, currentPosition).normalize();
+
+    // Set velocity directly towards the target (XZ plane only)
     this.body.velocity.x = direction.x * this.speed;
     this.body.velocity.z = direction.z * this.speed;
 
-    // Optionally, stop any vertical movement (if they're flying)
+    // Stop any vertical movement
     this.body.velocity.y = 0;
+
+    // Make the model face the target position
+    if (this.mesh) {
+        this.mesh.lookAt(targetPosition);
+    }
   }
 
   update() {
-    if (this.mesh) {
-      this.mesh.position.copy(this.body.position);
-      this.mesh.quaternion.copy(this.body.quaternion); // Sync rotation if needed
-    }
+      if (this.mesh) {
+          // Sync position and rotation with physics body
+          this.mesh.position.copy(this.body.position);
+      }
   }
 }
