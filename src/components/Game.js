@@ -218,6 +218,7 @@ export class Game {
   start() {
     this.paused = false;
     this.levelManager.startLevel();
+
   }
 
   pause() {
