@@ -49,21 +49,18 @@ export class PhysicsWorld {
       texture.wrapT = THREE.RepeatWrapping;
       texture.repeat.set(10, 10);
     });
-
     // Physics ground
     const groundShape = new CANNON.Box(new CANNON.Vec3(250, 0.1, 250));
     const groundBody = new CANNON.Body({ mass: 0 });
     groundBody.addShape(groundShape);
     groundBody.position.set(0, -0.1, 0);
     this.world.addBody(groundBody);
-
     // Visual ground
     const groundGeometry = new THREE.PlaneGeometry(500, 500);
     const groundMaterial = new THREE.MeshStandardMaterial({ 
       map: grassTexture,
       side: THREE.DoubleSide 
     });
-
     const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
     groundMesh.rotation.x = -Math.PI / 2;
     groundMesh.receiveShadow = true;
@@ -147,7 +144,6 @@ export class PhysicsWorld {
 
   update(timeStep) {
     this.world.step(timeStep);
-
     this.objects.forEach(({ body, mesh, light }) => {
       mesh.position.copy(body.position);
       mesh.quaternion.copy(body.quaternion);
