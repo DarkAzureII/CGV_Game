@@ -1,4 +1,3 @@
-// File: physicsWorld.js
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import CannonDebugger from 'cannon-es-debugger';  // Cannon debugger for visualization
@@ -9,6 +8,7 @@ export class PhysicsWorld {
     this.sceneManager = sceneManager;
     this.cannonDebugger = null;
     this.objects = [];  // Array to store { body, mesh } pairs
+    this.projectiles = []; // Array to manage active projectiles
   }
 
   setup() {
@@ -34,27 +34,18 @@ export class PhysicsWorld {
         '/assets/skybox/row-2-column-2.png'  // Back
     ]);
 
-    // Disable mipmaps for non-power-of-two textures
     texture.generateMipmaps = false;
-    
-    // Set filters to avoid mipmapping issues
-    texture.minFilter = THREE.LinearFilter;  // Linear filter for minification
-    texture.magFilter = THREE.LinearFilter;  // Linear filter for magnification
-
-    // Ensure the wrapping is set to ClampToEdge to handle non-power-of-two textures
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
 
-    // Set the scene background to the skybox texture
     this.sceneManager.scene.background = texture;
-}
+  }
 
-
-addGround() {
-  // Load the grass texture
-  const textureLoader = new THREE.TextureLoader();
-  const grassTexture = textureLoader.load('/assets/grass.png', (texture) => {
-      // Repeat the texture to cover the entire ground
+  addGround() {
+    const textureLoader = new THREE.TextureLoader();
+    const grassTexture = textureLoader.load('/assets/grass.png', (texture) => {
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
       texture.repeat.set(10, 10); // Adjust repeat as needed
@@ -101,34 +92,28 @@ addWorldBorders(size) {
   });
 }
 
-  
   addTree(position = { x: 0, y: 0, z: 0 }) {
-    // Create the trunk (physics)
     const trunkShape = new CANNON.Cylinder(0.5, 0.5, 5);
     const trunkBody = new CANNON.Body({ mass: 0 });
     trunkBody.addShape(trunkShape);
-    trunkBody.position.set(position.x, position.y + 2.5, position.z);  // Adjust height to half the trunk's height
+    trunkBody.position.set(position.x, position.y + 2.5, position.z);
 
-    // Create the foliage (physics)
     const foliageShape = new CANNON.Sphere(2);
     const foliageBody = new CANNON.Body({ mass: 0 });
     foliageBody.addShape(foliageShape);
-    foliageBody.position.set(position.x, position.y + 6.5, position.z);  // Positioned above the trunk
+    foliageBody.position.set(position.x, position.y + 6.5, position.z);
 
-    // Create the trunk (visual)
     const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 5);
     const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
     const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial);
     trunkMesh.castShadow = true;
     trunkMesh.receiveShadow = true;
 
-    // Create the foliage (visual)
     const foliageGeometry = new THREE.SphereGeometry(2, 16, 16);
     const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
     const foliageMesh = new THREE.Mesh(foliageGeometry, foliageMaterial);
     foliageMesh.castShadow = true;
     foliageMesh.receiveShadow = true;
-
       // Add a point light to the tree, starting off with 0 intensity
     const light = new THREE.PointLight(0xffd700, 50, 50); // Initially off (intensity = 0)
     light.position.set(position.x, position.y + 7, position.z);
@@ -139,7 +124,6 @@ addWorldBorders(size) {
     trunkMesh.position.copy(trunkBody.position);
     foliageMesh.position.copy(foliageBody.position);
 
-    // Add to physics and visual world
     this.addObject(trunkBody, trunkMesh);
     this.addObject(foliageBody, foliageMesh);
     this.sceneManager.scene.add(light);
@@ -152,24 +136,25 @@ addWorldBorders(size) {
     const mapSize = 125;  // Half the size of your map (1000x1000)
 
     for (let i = 0; i < count; i++) {
-        const x = (Math.random() - 0.5) * mapSize * 2;  // Random X position within the map
-        const z = (Math.random() - 0.5) * mapSize * 2;  // Random Z position within the map
-        const position = { x: x, y: 0, z: z };  // Y is 0, as trees should be placed on the ground
+        const x = (Math.random() - 0.5) * mapSize * 2;
+        const z = (Math.random() - 0.5) * mapSize * 2;
+        const position = { x: x, y: 0, z: z };
 
         this.addTree(position);
     }
   }
 
-
   addObject(body, mesh) {
-    // Add physics body and visual mesh pair to the array
     this.world.addBody(body);
     this.sceneManager.scene.add(mesh);
     this.objects.push({ body, mesh });
   }
 
+  addProjectile(projectile) {
+    this.projectiles.push(projectile);
+  }
+
   update(timeStep) {
-    // Step the physics world
     this.world.step(timeStep);
 
     // Sync the Three.js meshes with Cannon.js bodies
@@ -178,11 +163,18 @@ addWorldBorders(size) {
       mesh.quaternion.copy(body.quaternion);  // Sync rotation
     });
 
-    // Update the cannon debugger to visualize physics bodies
+    // Update projectiles
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const projectile = this.projectiles[i];
+      projectile.update(timeStep);
+
+      if (projectile.disposed) {
+        this.projectiles.splice(i, 1); // Remove disposed projectiles
+      }
+    }
+
     if (this.cannonDebugger) {
       this.cannonDebugger.update();
     }
   }
-
-  
 }

@@ -7,12 +7,28 @@ export class Enemy {
   constructor(scene, world) {
     this.scene = scene;
     this.world = world;
+    this.mesh = null; // Initialize mesh as null
+    this.health = 5;
+    this.isAlive = true;
+    this.speed = 20;
 
-    // Load the low-poly wolf model
+    // Create Cannon.js body for physics
+    const enemyShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+    this.body = new CANNON.Body({
+      mass: 1,
+      position: new CANNON.Vec3(Math.random() * 40 - 20, 1, Math.random() * 40 - 20),
+      shape: enemyShape,
+      material: new CANNON.Material({ friction: 0.9, restitution: 0.1 }),
+    });
+    this.body.fixedRotation = true;
+    this.body.updateMassProperties();
+    this.world.addBody(this.body);
+
+    // Load the enemy mesh asynchronously
     const loader = new GLTFLoader();
     loader.load('/assets/LowPolyWolf.glb', (gltf) => {
       this.mesh = gltf.scene;
-      this.mesh.scale.set(4, 4, 4); // Scale down if necessary
+      this.mesh.scale.set(4, 4, 4);
       this.mesh.traverse((node) => {
         if (node.isMesh) {
           node.castShadow = true;
@@ -21,25 +37,6 @@ export class Enemy {
       });
       this.scene.add(this.mesh);
     });
-
-    // Create Cannon.js body for physics
-    const enemyShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1)); // Match size with Three.js BoxGeometry
-    this.body = new CANNON.Body({
-      mass: 1, // Small mass to prevent flying away
-      position: new CANNON.Vec3(Math.random() * 40 - 20, 1, Math.random() * 40 - 20), // Start at a random position
-      shape: enemyShape,
-      material: new CANNON.Material({ friction: 0.9, restitution: 0.1 }), // Control friction and bounciness
-    });
-
-    // Constrain the enemy to stay on the ground
-    this.body.fixedRotation = true; // Prevent the body from rotating
-    this.body.updateMassProperties(); // Update mass properties to reflect changes
-
-    this.world.addBody(this.body);
-    this.health = 5; // Enemy starts with 5 health
-    this.isAlive = true; // Track if enemy is alive
-
-    this.speed = 20; // Control how fast enemies move toward the player
   }
 
   takeDamage(amount) {

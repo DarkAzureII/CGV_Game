@@ -11,9 +11,11 @@ import { Menu } from './menu.js';
 
 const clock = new THREE.Clock(); 
 
+
 export class Game {
   constructor() {
-    this.paused = true; // Game starts in a paused state
+    // Your existing setup code
+    this.paused = true;
     this.sceneManager = new SceneManager();
     this.physicsWorld = new PhysicsWorld(this.sceneManager);
     this.player = new Player(this.sceneManager.scene, this.physicsWorld.world);
@@ -25,7 +27,72 @@ export class Game {
     this.player.onDie = () => this.gameOver();
 
     this.setupGame();
-    this.requestPointerLock(); 
+    this.createCrosshair(); // Add this line to set up the crosshair
+    this.requestPointerLock();
+  }
+
+  createCrosshair() {
+    // Create the crosshair element
+    this.crosshair = document.createElement('div');
+    this.crosshair.style.position = 'absolute';
+    this.crosshair.style.width = '30px';  // Increased size for visibility
+    this.crosshair.style.height = '30px';
+    this.crosshair.style.background = 'transparent';
+    this.crosshair.style.pointerEvents = 'none';
+    this.crosshair.style.zIndex = '1000';
+
+    // Create horizontal and vertical lines for the crosshair
+    const horizontalLine = document.createElement('div');
+    horizontalLine.style.position = 'absolute';
+    horizontalLine.style.width = '30px';
+    horizontalLine.style.height = '2px';
+    horizontalLine.style.backgroundColor = 'red';
+    horizontalLine.style.top = '14px';
+
+    const verticalLine = document.createElement('div');
+    verticalLine.style.position = 'absolute';
+    verticalLine.style.width = '2px';
+    verticalLine.style.height = '30px';
+    verticalLine.style.backgroundColor = 'red';
+    verticalLine.style.left = '14px';
+
+    // Append lines to the crosshair
+    this.crosshair.appendChild(horizontalLine);
+    this.crosshair.appendChild(verticalLine);
+    document.body.appendChild(this.crosshair);
+
+    // Set the initial position of the crosshair to the center of the screen
+    this.cursorX = window.innerWidth / 2;
+    this.cursorY = window.innerHeight / 2;
+    this.crosshair.style.transform = `translate(${this.cursorX - 15}px, ${this.cursorY - 15}px)`;
+
+    // Mouse movement event listener for updating crosshair position
+    document.addEventListener('mousemove', (event) => {
+      if (document.pointerLockElement) {
+        this.cursorX += event.movementX;
+        this.cursorY += event.movementY;
+
+        // Keep within screen bounds
+        this.cursorX = Math.max(0, Math.min(window.innerWidth, this.cursorX));
+        this.cursorY = Math.max(0, Math.min(window.innerHeight, this.cursorY));
+
+        this.crosshair.style.transform = `translate(${this.cursorX - 15}px, ${this.cursorY - 15}px)`;
+      }
+    });
+
+    // Show/hide crosshair based on pointer lock status
+    document.addEventListener('pointerlockchange', () => {
+      const isLocked = document.pointerLockElement;
+      this.crosshair.style.display = isLocked ? 'block' : 'none';
+      if (isLocked) {
+        console.log("Pointer locked. Crosshair visible.");
+      } else {
+        console.log("Pointer unlocked. Crosshair hidden.");
+      }
+    });
+
+    // Make sure it's visible initially to verify setup
+    this.crosshair.style.display = 'block';
   }
 
   setupGame() {
@@ -37,27 +104,62 @@ export class Game {
 
   requestPointerLock() {
     const canvas = this.sceneManager.renderer.domElement;
-    
+
+    // Click to request pointer lock
     canvas.addEventListener('click', () => {
-      canvas.requestPointerLock();
+        canvas.requestPointerLock();
     });
-  
-    // Listen for pointer lock changes or errors
+
+    // Fullscreen mode on click (optional)
+    canvas.addEventListener('click', () => {
+        if (document.fullscreenElement !== canvas) {
+            canvas.requestFullscreen();
+        }
+    });
+
+    // Detect pointer lock changes
     document.addEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
     document.addEventListener('pointerlockerror', this.pointerLockError, false);
-  }
-  
-  pointerLockChange() {
+}
+
+pointerLockChange() {
     const canvas = this.sceneManager.renderer.domElement;
-  
+
     if (document.pointerLockElement === canvas) {
-      console.log('Pointer locked.');
-      this.inputManager.enableMouseControls();  // Enable your custom mouse controls here
+        console.log('Pointer locked.');
+        this.inputManager.enableMouseControls(); // Enable custom game controls
+        this.disableBrowserDefaults(); // Disable default browser behavior
     } else {
-      console.log('Pointer unlocked.');
-      this.inputManager.disableMouseControls(); // Disable mouse controls when unlocked
+        console.log('Pointer unlocked.');
+        this.inputManager.disableMouseControls(); // Disable game controls
+        this.enableBrowserDefaults(); // Restore default browser behavior
     }
-  }
+}
+
+disableBrowserDefaults() {
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', this.preventDefault);
+    // Disable default mouse wheel scrolling
+    document.addEventListener('wheel', this.preventDefault);
+    // Disable key events that interfere with the game (optional)
+    document.addEventListener('keydown', this.preventDefault);
+}
+
+enableBrowserDefaults() {
+    // Restore default browser behavior when pointer lock is lost
+    document.removeEventListener('contextmenu', this.preventDefault);
+    document.removeEventListener('wheel', this.preventDefault);
+    document.removeEventListener('keydown', this.preventDefault);
+}
+
+preventDefault(event) {
+    event.preventDefault(); // Prevent default browser behavior
+}
+
+pointerLockError() {
+    console.error('Error locking pointer.');
+}
+
   
   pointerLockError() {
     console.error('Error locking pointer.');
@@ -74,7 +176,7 @@ export class Game {
     this.enemyManager.update(this.player.mesh);
     this.collisionManager.checkCollisions();
     this.sceneManager.updateCamera(this.player);
-    this.player.shoot(this.enemyManager, this.inputManager.mouse, clock, this.collisionManager);  // Pass mouse data and enemy manager to handle shooting
+    this.player.shoot(this.enemyManager, this.inputManager.mouse, clock, this.sceneManager.scene, this.physicsWorld, this.collisionManager);  // Pass mouse data and enemy manager to handle shooting
 
     if (this.enemyManager.enemies.length === 0) {
       this.levelManager.levelComplete();
