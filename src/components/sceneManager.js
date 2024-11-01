@@ -89,7 +89,7 @@ export class SceneManager {
     this.camera.position.set(0 + playerPosition.x, 20, this.currentDistance + playerPosition.z);
   
     // Log the camera position to debug
-    console.log(`Camera Position: x=${this.camera.position.x}, y=${this.camera.position.y}, z=${this.camera.position.z}`);
+    //console.log(`Camera Position: x=${this.camera.position.x}, y=${this.camera.position.y}, z=${this.camera.position.z}`);
   }
   
 

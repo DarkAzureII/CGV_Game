@@ -139,15 +139,24 @@ export class Game {
     const timeStep = 1 / 60;
     this.physicsWorld.update(timeStep);
     this.player.updateMovement(this.inputManager.keys);
-    this.enemyManager.update(this.player.mesh);
+    this.player.update(this.inputManager.keys, clock.getDelta());
+
+    // Check if the player's mesh is ready
+    if (this.player.mesh) {
+        this.enemyManager.update(this.player.mesh);
+    } else {
+        console.warn("Player mesh is not yet available");
+    }
+
     this.collisionManager.checkCollisions();
     this.sceneManager.updateCamera(this.player);
     this.player.shoot(this.enemyManager, this.inputManager.mouse, clock, this.sceneManager.scene, this.physicsWorld, this.collisionManager);
 
     if (this.enemyManager.enemies.length === 0) {
-      this.levelManager.levelComplete();
+        this.levelManager.levelComplete();
     }
-  }
+}
+
 
   gameOver() {
     console.log("Game Over!");
