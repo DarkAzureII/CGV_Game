@@ -30,7 +30,7 @@ export class Player {
     this.moveSpeed = 0.5;
 
     this.shootRange = 10;  // Set the range for shooting
-    this.shootCooldown = 1; // Cooldown time between shots (in seconds)
+    this.shootCooldown = 0.5; // Cooldown time between shots (in seconds)
     this.lastShotTime = 0;  // Track the time since the last shot
 
     this.createShootingRangeCircle();

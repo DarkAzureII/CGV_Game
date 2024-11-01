@@ -34,8 +34,7 @@ export class SceneManager {
 
   setupCamera() {
     // Initial camera position: slightly above and behind the player
-    this.camera.position.set(0, 30, 15);
-    this.camera.rotation.x = -Math.PI / 2.9; // Angle the camera downwards
+    this.camera.position.set(0, 15, this.currentDistance);
   }
 
   setupLights() {
@@ -65,13 +64,11 @@ export class SceneManager {
   }
 
   updateCamera(player) {
-    //console.log(player.body.position);
     if (!player || !player.body) return;
-
   
     // Offset values for the third-person view
     const offsetX = 0;  // Stay directly behind the player
-    const offsetY = 30; // Height above the player (adjust as needed)
+    const offsetY = 15; // Height above the player (adjust as needed)
     const offsetZ = this.currentDistance; // Distance behind the player based on currentDistance
   
     // Get player's current position
@@ -83,12 +80,16 @@ export class SceneManager {
       playerPosition.y + offsetY,
       playerPosition.z + offsetZ
     );
-
+  
+    // Smoothly interpolate camera's position toward the target position
+    this.camera.position.lerp(this.targetPosition, this.cameraLerpSpeed);
+  
+    // Make the camera look at the player
     //this.camera.lookAt(playerPosition);
-    this.camera.position.set(0 + playerPosition.x, 30, 15 + playerPosition.z);
+    this.camera.position.set(0 + playerPosition.x, 20, this.currentDistance + playerPosition.z);
   
     // Log the camera position to debug
-    //console.log(`Camera Position: x=${this.camera.position.x}, y=${this.camera.position.y}, z=${this.camera.position.z}`);
+    console.log(`Camera Position: x=${this.camera.position.x}, y=${this.camera.position.y}, z=${this.camera.position.z}`);
   }
   
 
