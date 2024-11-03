@@ -17,8 +17,10 @@ export default class Boss {
         this.scene.add(this.mesh);
 
         // Optional point light above the boss
-        const bossLight = new THREE.PointLight(0xff0000, 1, 50);
+        const bossLight = new THREE.PointLight(0xff0000, 50, 20);
         bossLight.position.set(0, 15, 0);
+        bossLight.castShadow = true;
+
         this.scene.add(bossLight);
     }
 

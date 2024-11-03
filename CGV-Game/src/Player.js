@@ -13,6 +13,8 @@ export default class Player {
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.y = 1; // Half height to place on ground
+        this.mesh.castShadow = true; // Cast shadows
+        
         this.scene.add(this.mesh);
 
         this.currentSpell = null;

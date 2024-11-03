@@ -131,24 +131,26 @@ export default class Map {
     }
     
     addForestMap() {
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // Soft white light
         this.scene.add(this.ambientLight);
     
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
         this.directionalLight.position.set(5, 10, 7.5); // Position the light
+        this.directionalLight.castShadow =true;
         this.scene.add(this.directionalLight);
     
         const forestGround = new THREE.Mesh(
             new THREE.PlaneGeometry(100, 100),
-            new THREE.MeshBasicMaterial({ color: 0x228B22 })
+            new THREE.MeshStandardMaterial({ color: 0x228B22 })
         );
         forestGround.rotation.x = -Math.PI / 2;
+        forestGround.receiveShadow = true; // Receive shadows
         this.scene.add(forestGround);
         this.interactiveObjects.push(forestGround);
     
         this.obstacleBoundingBoxes = [];  // Initialize bounding boxes array
     
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 20; i++) {
             const treePosition = new THREE.Vector3(
                 THREE.MathUtils.randFloat(-40, 40),
                 0,
@@ -187,13 +189,15 @@ export default class Map {
 
     createTree(position) {
         const geometry = new THREE.CylinderGeometry(0.5, 1, 4, 8);
-        const material = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
         const trunk = new THREE.Mesh(geometry, material);
+        trunk.castShadow = true; // Cast shadows
         
         const foliageGeometry = new THREE.ConeGeometry(2, 5, 8);
-        const foliageMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22 });
+        const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
         const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
         foliage.position.y = 3;
+        foliage.castShadow = true; // Cast shadows
     
         const tree = new THREE.Group();
         tree.add(trunk);
@@ -206,7 +210,7 @@ export default class Map {
     
     createRock(position) {
         const geometry = new THREE.DodecahedronGeometry(1, 0);
-        const material = new THREE.MeshBasicMaterial({ color: 0x808080 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x808080 });
         const rock = new THREE.Mesh(geometry, material);
         rock.position.copy(position);
         rock.userData.isMapObject = true;
@@ -216,10 +220,11 @@ export default class Map {
     
     createBush(position) {
         const geometry = new THREE.SphereGeometry(1.5, 8, 8);
-        const material = new THREE.MeshBasicMaterial({ color: 0x006400 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x006400 });
         const bush = new THREE.Mesh(geometry, material);
         bush.position.copy(position);
         bush.userData.isMapObject = true;
+        bush.castShadow = true; // Cast shadows
     
         return bush;  // Return the bush mesh
     }
@@ -227,21 +232,41 @@ export default class Map {
     
 
     addDesertMap() {
+
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // Soft white light
+        this.scene.add(this.ambientLight);
+    
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        this.directionalLight.position.set(5, 10, 7.5); // Position the light
+        this.directionalLight.castShadow =true;
+        this.scene.add(this.directionalLight);
+    
         const desertGround = new THREE.Mesh(
             new THREE.PlaneGeometry(100, 100),
             new THREE.MeshBasicMaterial({ color: 0xC2B280 })
         );
         desertGround.rotation.x = -Math.PI / 2;
+        desertGround.receiveShadow = true; // Receive shadows
         this.scene.add(desertGround);
         this.interactiveObjects.push(desertGround);
+
     }
 
     addCityMap() {
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // Soft white light
+        this.scene.add(this.ambientLight);
+    
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        this.directionalLight.position.set(5, 10, 7.5); // Position the light
+        this.directionalLight.castShadow =true;
+        this.scene.add(this.directionalLight);
+    
         const cityGround = new THREE.Mesh(
             new THREE.PlaneGeometry(100, 100),
             new THREE.MeshBasicMaterial({ color: 0x808080 })
         );
         cityGround.rotation.x = -Math.PI / 2;
+        cityGround.receiveShadow = true; // Receive shadows
         this.scene.add(cityGround);
         this.interactiveObjects.push(cityGround);
     }
