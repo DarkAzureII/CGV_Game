@@ -43,6 +43,41 @@ export default class Map {
         }
     }
 
+    addWorldBorders(size) {
+        const borderThickness = 1;  // Thickness of the walls
+        const borderHeight = 50;      // Height of the walls (to ensure player can't jump over)
+        
+        // Material for the borders (solid color, non-reflective)
+        const borderMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0 }); // Clear material
+        
+        // Positions and dimensions for each border wall
+        const borders = [
+            { position: { x: -size / 2, y: borderHeight / 2, z: 0 }, size: [borderThickness, borderHeight, size] }, // Left wall
+            { position: { x: size / 2, y: borderHeight / 2, z: 0 }, size: [borderThickness, borderHeight, size] }, // Right wall
+            { position: { x: 0, y: borderHeight / 2, z: -size / 2 }, size: [size, borderHeight, borderThickness] }, // Front wall
+            { position: { x: 0, y: borderHeight / 2, z: size / 2 }, size: [size, borderHeight, borderThickness] }  // Back wall
+        ];
+        
+        borders.forEach(border => {
+            // Create geometry based on the border size
+            const geometry = new THREE.BoxGeometry(...border.size);
+            
+            // Create the mesh with geometry and material
+            const wall = new THREE.Mesh(geometry, borderMaterial);
+            
+            // Set the wall's position
+            wall.position.set(border.position.x, border.position.y, border.position.z);
+            
+            // Add the wall to the scene
+            this.scene.add(wall);
+    
+            // Create and add the bounding box for collision detection
+            const boundingBox = new THREE.Box3().setFromObject(wall);
+            this.obstacleBoundingBoxes.push(boundingBox);  // Add the wall's bounding box to the array
+        });
+    }
+    
+
     loadMap(mapType, enemySpawner) {
         // Clear the previous map and enemies before loading a new one
         this.clearMap(enemySpawner);
@@ -53,14 +88,17 @@ export default class Map {
             case 'forest':
                 this.addForestMap();
                 this.playBackgroundMusic('assets/audio/forest_bg.mp3'); // Specify the forest track
+                this.addWorldBorders(100);
                 break;
             case 'desert':
                 this.addDesertMap();
                 this.playBackgroundMusic('assets/audio/desert_bg.mp3'); // Specify the desert track
+                this.addWorldBorders(100);
                 break;
             case 'city':
                 this.addCityMap();
                 this.playBackgroundMusic('assets/audio/city_bg.mp3'); // Specify the city track
+                this.addWorldBorders(100);
                 break;
             default:
                 console.warn(`Unknown map type: ${mapType}`);
