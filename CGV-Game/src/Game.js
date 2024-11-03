@@ -35,6 +35,8 @@ export default class Game {
 
         // Map
         this.map = new Map(this.scene);
+        this.blasterSound = new Audio('assets/audio/blaster.mp3');
+        this.blasterSound.volume = 0.8;
 
         // Input with domElement
         this.input = new Input(this.renderer.domElement);
@@ -171,7 +173,10 @@ export default class Game {
         this.optionsButton.addEventListener('click', () => this.showOptions());
         this.quitButton.addEventListener('click', () => this.quitGame());
 
-        this.resumeButton.addEventListener('click', () => this.setState(GameState.PLAYING));
+        this.resumeButton.addEventListener('click', () => {
+            console.log("Resume button clicked"); // Debug log
+            this.togglePause('resume'); // Pass 'resume' string to resume game
+        });
         this.returnToMenuButtonPause.addEventListener('click', () => this.setState(GameState.MENU));
         this.quitButtonPause.addEventListener('click', () => this.quitGame());
 
@@ -338,6 +343,7 @@ export default class Game {
 
         // Initialize the map based on mapType
         this.map.loadMap(this.currentLevel.mapType, this.enemySpawner);
+        this.player.setObstacles(this.map.obstacleBoundingBoxes);
 
         // Initialize Enemy Spawner based on level configurations
         this.enemySpawner = new EnemySpawner(this.scene, this.currentLevel, () => {
@@ -465,16 +471,48 @@ export default class Game {
     }
 
     togglePause(e) {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' || e === 'resume') { // 'resume' used for button click
             if (this.state === GameState.PLAYING) {
+                console.log("Pausing game"); // Debug log
                 this.setState(GameState.PAUSED);
+                this.pauseAllSounds();
             } else if (this.state === GameState.PAUSED) {
+                console.log("Resuming game"); // Debug log
                 this.setState(GameState.PLAYING);
+                this.resumeAllSounds();
             }
         }
     }
-
     
+    pauseAllSounds() {
+        if (this.blasterSound && !this.blasterSound.paused) {
+            this.blasterSound.pause();
+            this.blasterSoundWasPlaying = true;
+        } else {
+            this.blasterSoundWasPlaying = false;
+        }
+    
+        const backgroundMusic = this.map.getBackgroundMusic();
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+            console.log(`Paused background music at ${backgroundMusic.currentTime}s`);
+            this.backgroundMusicWasPlaying = true;
+        } else {
+            this.backgroundMusicWasPlaying = false;
+        }
+    }
+    
+    resumeAllSounds() {
+        if (this.blasterSoundWasPlaying) {
+            this.blasterSound.play().catch(error => console.error("Audio play error:", error));
+        }
+    
+        const backgroundMusic = this.map.getBackgroundMusic();
+        if (this.backgroundMusicWasPlaying && backgroundMusic) {
+            console.log(`Resuming background music from ${backgroundMusic.currentTime}s`);
+            backgroundMusic.play().catch(error => console.error("Background music play error:", error));
+        }
+    }
 
     handleMapClick(event) {
       // Only respond to left clicks (button === 0)
@@ -569,11 +607,21 @@ export default class Game {
         // Add the bullet to the bullets array
         this.bullets.push(bullet);
 
+        // Play blaster sound
+        this.playBlasterSound();
+
         // Reset shooting cooldown
         this.canShoot = false;
         this.shootTimer = 0;
 
         console.log('Bullet fired!');
+    }
+
+    playBlasterSound() {
+        if (this.blasterSound) {
+            this.blasterSound.currentTime = 0; // Reset sound if already playing
+            this.blasterSound.play().catch(error => console.error("Audio play error:", error));
+        }
     }
 
     updateShooting(delta) {
