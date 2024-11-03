@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export default class CameraController {
-    constructor(camera, domElement, input, player) {
+    constructor(camera, domElement, input, player = null) {
         this.camera = camera;
         this.domElement = domElement;
         this.input = input;
@@ -32,18 +32,26 @@ export default class CameraController {
         this.minRadius = 5;
         this.maxRadius = 50;
         this.followDamping = 0.1;
-
-        // Initial update
-        this.updateCameraPosition();
     }
 
     setSensitivity(value) {
         this.sensitivity = value; // Adjust sensitivity
     }
 
+    setPlayer(player) {
+        this.player = player;
+        console.log('CameraController: Player has been set.');
+    }
+
     update(delta) {
+        if (!this.player || !this.player.mesh) {
+            //console.log('CameraController: No player to follow.');
+            return;
+        }
+
         // Update the target to the player's current position
         this.target.copy(this.player.mesh.position);
+        //console.log('CameraController: Camera looking at:', this.target);
 
         // Handle camera rotation
         if (this.input.isMouseRotating()) { // isMouseRotating checks for RMB
@@ -73,14 +81,12 @@ export default class CameraController {
         this.camera.position.y = Math.cos(this.currentPhi) * this.currentRadius + this.target.y;
         this.camera.position.z = sinPhiRadius * Math.cos(this.currentTheta) + this.target.z;
 
+        //console.log('CameraController: Camera position:', this.camera.position);
+
         // Make the camera look at the player
         this.camera.lookAt(this.target);
 
         // Reset wheel delta after handling
         this.input.wheelDelta = 0;
-    }
-
-    updateCameraPosition() {
-        // This method is now redundant and can be removed to avoid conflicts
     }
 }

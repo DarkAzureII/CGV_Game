@@ -9,7 +9,14 @@ export default class Bullet {
 
         // Create bullet mesh (e.g., a small sphere)
         const geometry = new THREE.SphereGeometry(0.2, 8, 8);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color
+        
+        // Updated material with blue emission
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xffffff, // White color
+            emissive: 0x0000ff, // Blue emissive color
+            emissiveIntensity: 0.5 // Adjust intensity as needed
+        });
+        
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.copy(position);
         this.scene.add(this.mesh);

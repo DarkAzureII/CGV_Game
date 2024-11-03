@@ -23,6 +23,7 @@ export default class Game {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x87ceeb); // Sky blue background
 
+        this.state = GameState.MENU;
         // Camera
         this.camera = new THREE.PerspectiveCamera(
             75,
@@ -44,12 +45,12 @@ export default class Game {
         // Input with domElement
         this.input = new Input(this.renderer.domElement);
 
-        // Player with camera reference
-        this.player = new Player(this.scene, this.input, this.camera);
-        console.log(this.scene.children);
+        // Initialize game state
+        this.isShooting = false;
+        
 
-        // Camera Controller
-        this.cameraController = new CameraController(this.camera, this.renderer.domElement, this.input, this.player);
+        // Initialize Camera Controller (without player reference yet)
+        this.cameraController = new CameraController(this.camera, this.renderer.domElement, this.input);
 
         // UI
         this.ui = new UI(this);
@@ -65,14 +66,11 @@ export default class Game {
 
         // Shooting cooldown
         this.canShoot = true;
-        this.shootCooldown = 0.5; // seconds
+        this.shootCooldown = 0.3; // seconds
         this.shootTimer = 0;
 
         // Initialize Enemy Spawner
         this.enemySpawner = null;
-
-        // Initialize game state
-        this.state = GameState.MENU;
 
         // Level configurations
         this.levelConfigs = this.getLevelConfigurations();
@@ -99,7 +97,6 @@ export default class Game {
         this.togglePause = this.togglePause.bind(this);
         window.addEventListener('keydown', this.togglePause);
         this.renderer.domElement.addEventListener('click', this.handleMapClick);
-        
     }
 
     onAttackPlayer() {
@@ -185,10 +182,10 @@ export default class Game {
         this.returnToMenuButtonPause.addEventListener('click', () => this.setState(GameState.MENU));
         this.quitButtonPause.addEventListener('click', () => this.quitGame());
 
-        this.restartButton.addEventListener('click', () => this.restartLevel());
+        this.restartButton.addEventListener('click', () => this.setState(GameState.MENU));
         this.returnToMenuButtonGameOver.addEventListener('click', () => this.setState(GameState.MENU));
 
-        this.nextLevelButton.addEventListener('click', () => this.startNextLevel());
+        this.nextLevelButton.addEventListener('click', () => this.setState(GameState.MENU));
         this.returnToMenuButtonLevelWon.addEventListener('click', () => this.setState(GameState.MENU));
 
         this.optionsButton.addEventListener('click', () => this.showOptions());
@@ -265,6 +262,24 @@ export default class Game {
 
     hideLevelWon() {
         this.levelWonScreen.style.display = 'none';
+    }
+
+    resetEverything() {
+        this.playerHealth = 100;
+        this.bullets.forEach(bullet => bullet.remove());
+        this.bullets = [];
+        if (this.enemySpawner) {
+            this.enemySpawner.removeAllEnemies();
+            this.enemySpawner = null;
+        }
+        
+        // Remove player from the scene and reset reference
+        if (this.player) {
+            this.scene.remove(this.player.mesh);
+            this.player = null;
+        }
+
+        this.map.clearMap(this.enemySpawner);
     }
 
     hideAllMenus() {
@@ -350,9 +365,13 @@ export default class Game {
             return;
         }
 
-        // Initialize the map based on mapType
         this.map.loadMap(this.currentLevel.mapType, this.enemySpawner);
+
+        this.player = new Player(this.scene, this.input, this.camera);
         this.player.setObstacles(this.map.obstacleBoundingBoxes);
+        this.cameraController.setPlayer(this.player);
+        this.player.mesh.visible = true;
+        this.player.name = 'player';
 
         // Initialize Enemy Spawner based on level configurations
         this.enemySpawner = new EnemySpawner(this.scene, this.currentLevel, () => {
@@ -380,7 +399,7 @@ export default class Game {
 
         // Update Camera
         if (this.state !== GameState.PAUSED) {
-            this.cameraController.update(delta);
+            this.cameraController.update(delta, this.isShooting);
         }
 
         // Update Enemies via EnemySpawner
@@ -453,6 +472,7 @@ export default class Game {
                 this.hidePauseMenu();
                 this.hideGameOver();
                 this.hideLevelWon();
+                this.resetEverything();
                 break;
             case GameState.LEVEL_SELECT:
                 this.hideMainMenu();
@@ -603,6 +623,8 @@ export default class Game {
     shootBullet(targetPoint) {
         if (!this.canShoot) return;
         console.log('Attempting to fire bullet'); 
+
+        this.player.raiseArms(this.isShooting);
 
         // Get the player's current position
         const playerPosition = this.player.mesh.position.clone();
