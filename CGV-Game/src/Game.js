@@ -15,8 +15,8 @@ export default class Game {
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.shadowMap.enabled = true; // Enable shadow mapping
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+        this.renderer.shadowMap.enabled = true; // Enable shadows
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.getElementById(containerId).appendChild(this.renderer.domElement);
 
         // Scene

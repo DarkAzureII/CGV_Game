@@ -8,7 +8,6 @@ export default class Player {
         this.camera = camera;
         this.speed = 10;
         this.force = new THREE.Vector3(); // To store force applied to the player
-
         // Create Player Body Parts
         this.createPlayerMesh();
 
