@@ -2,27 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your Three.js Game</title>
+    <title>Echoes of the Fallen</title>
     <link rel="stylesheet" href="styles.css">
+        <!-- Preconnect and import the McLaren and Square Peg fonts from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=McLaren&family=Square+Peg&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/menuStyle.css">
+
+
+
+
 </head>
 <body>
     <div id="game-container"></div>
 
     <!-- Main Menu -->
-    <div id="main-menu" class="menu-overlay">
-        <h1>My Three.js Game</h1>
-        <button id="start-button">Start</button>
-        <button id="options-button">Options</button>
-        <button id="quit-button">Quit</button>
-    </div>
+    <div id="main-menu" class="menu-overlay" >
+        <!-- Blurred background image -->
+        <div class="background-wrapper"></div>
+        <!-- Overlay to darken the background -->
+        <div class="background-overlay"></div>
 
+        <div class="title-container">
+        <h1 class="main-title">Echoes of the Fallen</h1>
+        </div>
+        <div class="container">
+        <!-- Your story content -->
+        <p class="fade-in">
+            In a time long forgotten, the world wasn’t a mere battleground of endless waves. It was alive—each corner of its forests, deserts, and cities was filled with life and wonder. But darkness came, corrupting the heart of this land and its inhabitants. Once-peaceful creatures now rise as relentless enemies, drawn to the energy of a mysterious Wanderer… you.
+            <br><br>
+            You are the last defender, bound by an ancient call to cleanse this land. As you traverse from the twisted forests to the barren deserts and finally to the forsaken ruins of the city, waves of darkened enemies challenge you, testing your strength and resolve.
+            <br><br>
+            Every enemy you vanquish pushes back the corruption, but the darkness is stubborn. After a seemingly endless onslaught, each area releases its final protector—a powerful, corrupted entity, an embodiment of the darkness. In the depths of the forest, at the heart of the desert, and within the shadows of the city, these bosses lie in wait.
+            <br><br>
+            As each boss falls, the land briefly clears, and a part of this world’s spirit is restored. Yet, the battle is far from over. Will you overcome every foe and bring light back to this shattered world, one stage at a time? Or will you fall to the relentless forces of darkness that have plagued this land for so long?
+            <br><br>
+            Prepare yourself, Wanderer. The journey ahead is filled with enemies, ancient guardians of the shadows, and the promise of victory… if you have the strength to claim it.
+            <br><br>
+        </p>
+
+        <!-- Button to navigate to menu.html -->
+
+        
+        <!-- Buttons from new index.html -->
+        <button id="start-button" class="menu-button">Start</button>
+        <button id="options-button" class="menu-button">Options</button>
+        <button id="quit-button" class="menu-button">Quit</button>
+
+        </div>
+
+
+      </div>
     <!-- Level Select Menu -->
     <div id="level-select" class="menu-overlay" style="display: none;">
+        <!-- Blurred background image -->
+        <div class="background-wrapper"></div>
+        <!-- Overlay to darken the background -->
+        <div class="background-overlay"></div>
         <h2>Select Level</h2>
         <div id="level-options">
             <!-- Dynamically generated level buttons -->
         </div>
-        <button id="back-to-menu-button">Back to Menu</button>
+        <button id="back-to-menu-button" class="menu-button">Back to Menu</button>
     </div>
 
     <!-- Countdown Screen -->
@@ -33,23 +75,23 @@
     <!-- Pause Menu -->
     <div id="pause-menu" class="menu-overlay" style="display: none;">
         <h2>Paused</h2>
-        <button id="resume-button">Resume</button>
-        <button id="return-to-menu-button">Main Menu</button>
-        <button id="quit-button-pause">Quit</button>
+        <button id="resume-button" class="menu-button" >Resume</button>
+        <button id="return-to-menu-button" class="menu-button">Main Menu</button>
+        <button id="quit-button-pause" class="menu-button">Quit</button>
     </div>
 
     <!-- Game Over Screen -->
     <div id="game-over" class="menu-overlay" style="display: none;">
         <h2>Game Over</h2>
-        <button id="restart-button">Restart</button>
-        <button id="return-to-menu-button-gameover">Main Menu</button>
+        <button id="restart-button" class="menu-button">Restart</button>
+        <button id="return-to-menu-button-gameover" class="menu-button">Main Menu</button>
     </div>
 
     <!-- Level Won Screen -->
     <div id="level-won" class="menu-overlay" style="display: none;">
         <h2>Level Won!</h2>
-        <button id="next-level-button">Next Level</button>
-        <button id="return-to-menu-button-levelwon">Main Menu</button>
+        <button id="next-level-button" class="menu-button" >Next Level</button>
+        <button id="return-to-menu-button-levelwon" class="menu-button" >Main Menu</button>
     </div>
 
     <div id="hud" style="position: absolute; top: 10px; left: 10px; color: white; z-index: 5;">
@@ -59,11 +101,41 @@
     </div>
 
     <!-- Options Menu -->
-    <div id="options-menu" style="display: none;">
-      <h2>Options</h2>
-      <label for="sensitivitySlider">Camera Sensitivity:</label>
-      <input type="range" id="sensitivitySlider" min="0.1" max="2" step="0.1" value="1">
-      <button id="options-back-button">Back</button>
+    <div id="options-menu" class = "menu-overlay" style="display: none;">
+      <!-- Blurred background image -->
+      <div class="background-wrapper"></div>
+      <!-- Overlay to darken the background -->
+      <div class="background-overlay"></div>
+
+
+      <div class = "instructions-container">
+        <span>Options</span>
+        <div class="row">
+            <div class="column">
+                <img src="/assets/images/tevkey.png" alt="Move" />
+                <p>Move</p>
+            </div>
+            <div class="column">
+                <img src="/assets/images/mouse.png" alt="Look" />
+                <p>Aim</p>
+            </div>
+            <div class="column">
+                <img src="/assets/images/clicking.png" alt="Shoot" />
+                <p>Left Click: Shoot</p>
+            </div>
+            <div class="column">
+                <img src="/assets/images/clicking.png" alt="Shoot" />
+                <p>Right Hold: Move Camera</p>
+            </div>
+        </div>
+        <span>
+            <label for="sensitivitySlider">Camera Sensitivity:</label>
+            <input type="range" id="sensitivitySlider" min="0.1" max="2" step="0.1" value="1">
+        </span>
+
+        <button id="options-back-button" class= "menu-button">Back</button>
+
+      </div>
     </div>
 
 
