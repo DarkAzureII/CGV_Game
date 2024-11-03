@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Three.js Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container"></div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="menu-overlay">
+        <h1>My Three.js Game</h1>
+        <button id="start-button">Start</button>
+        <button id="options-button">Options</button>
+        <button id="quit-button">Quit</button>
+    </div>
+
+    <!-- Level Select Menu -->
+    <div id="level-select" class="menu-overlay" style="display: none;">
+        <h2>Select Level</h2>
+        <div id="level-options">
+            <!-- Dynamically generated level buttons -->
+        </div>
+        <button id="back-to-menu-button">Back to Menu</button>
+    </div>
+
+    <!-- Countdown Screen -->
+    <div id="countdown" class="menu-overlay" style="display: none;">
+        <h1 id="countdown-number">3</h1>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pause-menu" class="menu-overlay" style="display: none;">
+        <h2>Paused</h2>
+        <button id="resume-button">Resume</button>
+        <button id="return-to-menu-button">Main Menu</button>
+        <button id="quit-button-pause">Quit</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over" class="menu-overlay" style="display: none;">
+        <h2>Game Over</h2>
+        <button id="restart-button">Restart</button>
+        <button id="return-to-menu-button-gameover">Main Menu</button>
+    </div>
+
+    <!-- Level Won Screen -->
+    <div id="level-won" class="menu-overlay" style="display: none;">
+        <h2>Level Won!</h2>
+        <button id="next-level-button">Next Level</button>
+        <button id="return-to-menu-button-levelwon">Main Menu</button>
+    </div>
+
+    <div id="hud" style="position: absolute; top: 10px; left: 10px; color: white; z-index: 5;">
+      <div id="player-health">Health: 100</div>
+      <div id="enemy-count">Enemies: 0</div>
+      <div id="boss-health" style="display: none;">Boss Health: 500</div>
+    </div>
+
+    <!-- Options Menu -->
+    <div id="options-menu" style="display: none;">
+      <h2>Options</h2>
+      <label for="sensitivitySlider">Camera Sensitivity:</label>
+      <input type="range" id="sensitivitySlider" min="0.1" max="2" step="0.1" value="1">
+      <button id="options-back-button">Back</button>
+    </div>
+
+
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

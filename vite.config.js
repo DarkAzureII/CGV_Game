@@ -1,7 +1,13 @@
-export default {
-    root: './public', // Point to public folder for index.html
-    build: {
-      outDir: '../dist', // Output folder for production builds
-    }
-  };
-  
+// vite.config.js
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  // Base public path
+  base: '/',
+  // Assets directory
+  publicDir: 'public',
+  // Server configuration
+  server: {
+    port: 3000, // Change the port if needed
+  },
+});
