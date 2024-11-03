@@ -91,6 +91,22 @@ export default class Map {
     getBackgroundMusic() {
         return this.backgroundMusic;
     }
+
+    addLake() {
+        // Define a thin box geometry to represent the lake
+        const lakeGeometry = new THREE.BoxGeometry(15, 0.1, 15); // Width, height (thin layer), and depth
+        const lakeMaterial = new THREE.MeshBasicMaterial({ color: 0x4682B4, transparent: true, opacity: 0.7 });
+        const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+        lake.position.set(0, 0.05, 0); // Position slightly above ground level if needed
+        lake.name = 'lake';
+    
+        this.scene.add(lake);
+        
+        // Create the bounding box for the lake
+        this.lakeBoundingBox = new THREE.Box3().setFromObject(lake);
+        console.log('Lake Bounding Box:', this.lakeBoundingBox.min, this.lakeBoundingBox.max);
+    }
+     
     
     addForestMap() {
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
@@ -109,6 +125,8 @@ export default class Map {
         this.interactiveObjects.push(forestGround);
     
         this.obstacleBoundingBoxes = [];  // Initialize bounding boxes array
+        this.addLake();
+        console.log('Lake Bounding Box:', this.lakeBoundingBox.min, this.lakeBoundingBox.max);
     
         for (let i = 0; i < 50; i++) {
             const treePosition = new THREE.Vector3(
@@ -144,6 +162,15 @@ export default class Map {
                 this.obstacleBoundingBoxes.push(new THREE.Box3().setFromObject(bush));
             }
         }
+    }
+    
+    isInLake(position) {
+        if (!this.lakeBoundingBox) return false;
+    
+        const isInside = this.lakeBoundingBox.containsPoint(position);
+        console.log("Checking lake containment for position:", position, "Result:", isInside); // Debugging log
+    
+        return isInside;
     }
     
 

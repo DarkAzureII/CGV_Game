@@ -7,20 +7,32 @@ export default class Enemy {
         this.type = type;
         this.speed = this.getSpeedByType(type);
         this.health = this.getHealthByType(type);
-        
-        // Create enemy mesh with specific color based on type
-        const geometry = new THREE.BoxGeometry(1, 2, 1);
-        const material = new THREE.MeshStandardMaterial({ color: this.getColorByType(type) });
+
+        // Create enemy crystal-like mesh with color based on type
+        const geometry = new THREE.OctahedronGeometry(1); // Crystal-like shape
+        const material = new THREE.MeshStandardMaterial({
+            color: this.getColorByType(type),
+            emissive: this.getColorByType(type),
+            emissiveIntensity: 0.5,
+            roughness: 0.2,
+            metalness: 0.8,
+        });
         this.mesh = new THREE.Mesh(geometry, material);
 
         // Set initial spawn position for the enemy
         this.mesh.position.copy(this.getSpawnPosition());
+
+        // Add a slight rotation to give it a floating crystal effect
+        this.mesh.rotation.set(Math.random(), Math.random(), Math.random());
 
         this.scene.add(this.mesh);
         this.attackRange = 2.5; // Define the distance at which the enemy can attack
         this.attackCooldown = 1.5; // Time in seconds between attacks
         this.timeSinceLastAttack = 0;
         this.engageDelay = 1.0;
+
+        // Floating animation variables
+        this.floatOffset = Math.random() * Math.PI * 2;
     }
 
     getSpeedByType(type) {
@@ -61,38 +73,40 @@ export default class Enemy {
     }
 
     update(delta, playerPosition, onAttackPlayer) {
-      if (!playerPosition) {
-          console.error("playerPosition is undefined in Enemy.update");
-          return;
-      }
+        if (!playerPosition) {
+            console.error("playerPosition is undefined in Enemy.update");
+            return;
+        }
 
-      // Move toward the player
-      const direction = new THREE.Vector3().subVectors(playerPosition, this.mesh.position).normalize();
-      this.mesh.position.addScaledVector(direction, this.speed * delta);
+        this.mesh.rotation.y += delta * 0.5;
+        this.mesh.position.y = 5 + Math.sin(delta * 2) * 0.5;
 
-      // Calculate distance to player
-      const distanceToPlayer = this.mesh.position.distanceTo(playerPosition);
+        // Move toward the player
+        const direction = new THREE.Vector3().subVectors(playerPosition, this.mesh.position).normalize();
+        this.mesh.position.addScaledVector(direction, this.speed * delta);
 
-      // Check if within attack range
-      if (distanceToPlayer <= this.attackRange) {
-          if (!this.firstAttack) {
-              // Wait for engage delay before the first attack
-              if (this.timeSinceLastAttack >= this.engageDelay) {
-                  onAttackPlayer();
-                  this.timeSinceLastAttack = 0; // Reset timer after first attack
-                  this.firstAttack = true;
-              }
-          } else if (this.timeSinceLastAttack >= this.attackCooldown) {
-              // Attack if within cooldown period after the first attack
-              onAttackPlayer();
-              this.timeSinceLastAttack = 0;
-          }
-      }
+        // Calculate distance to player
+        const distanceToPlayer = this.mesh.position.distanceTo(playerPosition);
 
-      // Increment the attack timer
-      this.timeSinceLastAttack += delta;
+        // Check if within attack range
+        if (distanceToPlayer <= this.attackRange) {
+            if (!this.firstAttack) {
+                // Wait for engage delay before the first attack
+                if (this.timeSinceLastAttack >= this.engageDelay) {
+                    onAttackPlayer();
+                    this.timeSinceLastAttack = 0; // Reset timer after first attack
+                    this.firstAttack = true;
+                }
+            } else if (this.timeSinceLastAttack >= this.attackCooldown) {
+                // Attack if within cooldown period after the first attack
+                onAttackPlayer();
+                this.timeSinceLastAttack = 0;
+            }
+        }
+
+        // Increment the attack timer
+        this.timeSinceLastAttack += delta;
     }
-
 
     takeDamage(amount) {
         this.health -= amount;

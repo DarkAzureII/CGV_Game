@@ -35,6 +35,7 @@ export default class Game {
 
         // Map
         this.map = new Map(this.scene);
+        this.map.name = 'map';
         this.blasterSound = new Audio('assets/audio/blaster.mp3');
         this.blasterSound.volume = 0.8;
 
