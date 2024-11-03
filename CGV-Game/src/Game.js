@@ -168,6 +168,8 @@ export default class Game {
         this.nextLevelButton = document.getElementById('next-level-button');
         this.returnToMenuButtonLevelWon = document.getElementById('return-to-menu-button-levelwon');
 
+        this.sensitivitySlider = document.getElementById('sensitivitySlider');
+
         // Attach event listeners
         this.startButton.addEventListener('click', () => this.setState(GameState.LEVEL_SELECT));
         this.backToMenuButton.addEventListener('click', () => this.setState(GameState.MENU));
@@ -190,6 +192,7 @@ export default class Game {
         this.optionsButton.addEventListener('click', () => this.showOptions());
         this.optionsBackButton.addEventListener('click', () => this.hideOptions());
 
+
         if (this.sensitivitySlider) {
           this.sensitivitySlider.addEventListener('input', (event) => {
               const sensitivity = parseFloat(event.target.value);
@@ -207,6 +210,7 @@ export default class Game {
       this.levelConfigs.forEach((config, index) => {
           const button = document.createElement('button');
           button.textContent = `Level ${index + 1}: ${config.name}`;
+          button.className = "menu-button";
           button.addEventListener('click', () => this.selectLevel(index));
           this.levelOptionsContainer?.appendChild(button);
       });
@@ -214,6 +218,7 @@ export default class Game {
 
     showMainMenu() {
         this.mainMenu.style.display = 'flex';
+
     }
 
     hideMainMenu() {
@@ -304,6 +309,7 @@ export default class Game {
     startNextLevel() {
         // Implement logic to start the next level
         // For simplicity, loop back to level select
+        this.hideLevelWon();
         this.setState(GameState.LEVEL_SELECT);
     }
 

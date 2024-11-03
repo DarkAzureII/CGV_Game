@@ -18,7 +18,7 @@ export default class CameraController {
 
         // Rotation parameters
         this.rotationSpeed = 0.002;
-        this.sensitivity = 1.0; // Default sensitivity multiplier
+        this.sensitivity = 0.1; // Default sensitivity multiplier
 
         // Damping factor for smooth movement (optional)
         this.damping = 0.1;
