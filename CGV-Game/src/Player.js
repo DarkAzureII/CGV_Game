@@ -79,12 +79,7 @@ export default class Player {
         // Apply movement if any direction is active
         if (direction.length() > 0) {
             direction.normalize();
-            const map = this.scene.getObjectByName('map');
-            const inLake = this.isInLake ? this.isInLake(this.mesh.position) : false;
-            console.log(`Player Position: ${this.mesh.position.x}, ${this.mesh.position.y}, ${this.mesh.position.z}`);
-            console.log(`In lake: ${inLake}`);
-            const adjustedSpeed = inLake ? this.speed * 0.1 : this.speed;
-            const movement = direction.clone().multiplyScalar(adjustedSpeed * delta);
+            const movement = direction.clone().multiplyScalar(this.speed * delta);
             const newPosition = this.mesh.position.clone().add(movement).add(this.force.clone().multiplyScalar(delta)); // Add force
     
             // Create a bounding box for the new position
