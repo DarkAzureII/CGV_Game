@@ -40,10 +40,10 @@ export default class Player {
             direction.sub(cameraDirection);
         }
         if (this.input.isKeyPressed('a')) {
-            direction.sub(cameraRight);
+            direction.add(cameraRight);
         }
         if (this.input.isKeyPressed('d')) {
-            direction.add(cameraRight);
+            direction.sub(cameraRight);
         }
 
         // Apply movement if any direction is active
